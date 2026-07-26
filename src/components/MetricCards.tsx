@@ -41,8 +41,8 @@ export const MetricCards: React.FC<MetricCardsProps> = ({ games, selectedFilter,
       value: total,
       subtext: `${completionRate}% Completion Rate`,
       icon: Gamepad2,
-      color: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20',
-      activeColor: 'ring-2 ring-indigo-500'
+      color: 'bg-[var(--theme-accent-subtle)] text-[var(--theme-accent)] border-[var(--theme-accent)]/30',
+      activeColor: 'ring-2 ring-[var(--theme-accent)]'
     },
     {
       id: 'Completed',
@@ -77,7 +77,7 @@ export const MetricCards: React.FC<MetricCardsProps> = ({ games, selectedFilter,
       value: `${totalHours} hrs`,
       subtext: `${backlog} Unstarted Games`,
       icon: Clock,
-      color: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20',
+      color: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
       activeColor: ''
     }
   ];
@@ -91,9 +91,13 @@ export const MetricCards: React.FC<MetricCardsProps> = ({ games, selectedFilter,
           <button
             key={metric.id}
             onClick={() => metric.id !== 'hours' && onSelectFilter(metric.id)}
-            className={`text-left p-4 rounded-xl border bg-slate-900/80 backdrop-blur-md transition-all duration-200 hover:border-slate-700 ${
-              isSelected ? `${metric.activeColor} bg-slate-800/90` : 'border-slate-800'
+            className={`text-left p-4 rounded-xl border backdrop-blur-md transition-all duration-200 ${
+              isSelected ? `${metric.activeColor}` : ''
             } ${metric.id !== 'hours' ? 'cursor-pointer hover:scale-[1.02]' : 'cursor-default'}`}
+            style={{
+              backgroundColor: isSelected ? 'var(--theme-card)' : 'var(--theme-surface)',
+              borderColor: isSelected ? 'var(--theme-accent)' : 'var(--theme-border)'
+            }}
             id={`metric-card-${metric.id}`}
           >
             <div className="flex items-center justify-between mb-2">

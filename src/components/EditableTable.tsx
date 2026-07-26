@@ -125,10 +125,10 @@ export const EditableTable: React.FC<EditableTableProps> = ({
   };
 
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-2xl shadow-xl overflow-hidden">
+    <div className="border rounded-2xl shadow-xl overflow-hidden" style={{ backgroundColor: 'var(--theme-surface)', borderColor: 'var(--theme-border)' }}>
       
       {/* Search & Filter Header Toolbar */}
-      <div className="p-4 border-b border-slate-800 bg-slate-950/40 flex flex-wrap items-center justify-between gap-3">
+      <div className="p-4 border-b flex flex-wrap items-center justify-between gap-3" style={{ backgroundColor: 'var(--theme-bg)', borderColor: 'var(--theme-border)' }}>
         <div className="flex items-center gap-2 flex-1 min-w-[240px]">
           <div className="relative w-full">
             <input
@@ -136,7 +136,8 @@ export const EditableTable: React.FC<EditableTableProps> = ({
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
               placeholder="🔍 Search game title, genre, or platform..."
-              className="w-full pl-3 pr-8 py-2 bg-slate-900 border border-slate-700/80 rounded-xl text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+              className="w-full pl-3 pr-8 py-2 border rounded-xl text-xs text-slate-100 placeholder-slate-500 focus:outline-none"
+              style={{ backgroundColor: 'var(--theme-input)', borderColor: 'var(--theme-border)' }}
               id="table-search-input"
             />
             {searchQuery && (
@@ -156,7 +157,8 @@ export const EditableTable: React.FC<EditableTableProps> = ({
           <select
             value={selectedStatus}
             onChange={(e) => onStatusChange(e.target.value)}
-            className="px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-xl text-xs text-slate-200 focus:outline-none focus:border-indigo-500 cursor-pointer"
+            className="px-3 py-1.5 border rounded-xl text-xs text-slate-200 focus:outline-none cursor-pointer"
+            style={{ backgroundColor: 'var(--theme-input)', borderColor: 'var(--theme-border)' }}
             id="filter-status-select"
           >
             <option value="all">All Statuses</option>
@@ -169,7 +171,8 @@ export const EditableTable: React.FC<EditableTableProps> = ({
           <select
             value={selectedGrade}
             onChange={(e) => onGradeChange(e.target.value)}
-            className="px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-xl text-xs text-slate-200 focus:outline-none focus:border-indigo-500 cursor-pointer"
+            className="px-3 py-1.5 border rounded-xl text-xs text-slate-200 focus:outline-none cursor-pointer"
+            style={{ backgroundColor: 'var(--theme-input)', borderColor: 'var(--theme-border)' }}
             id="filter-grade-select"
           >
             <option value="all">All Grades</option>
@@ -182,7 +185,8 @@ export const EditableTable: React.FC<EditableTableProps> = ({
           <select
             value={selectedPlatform}
             onChange={(e) => onPlatformChange(e.target.value)}
-            className="px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-xl text-xs text-slate-200 focus:outline-none focus:border-indigo-500 cursor-pointer"
+            className="px-3 py-1.5 border rounded-xl text-xs text-slate-200 focus:outline-none cursor-pointer"
+            style={{ backgroundColor: 'var(--theme-input)', borderColor: 'var(--theme-border)' }}
             id="filter-platform-select"
           >
             <option value="all">All Platforms</option>
@@ -199,7 +203,7 @@ export const EditableTable: React.FC<EditableTableProps> = ({
                 onPlatformChange('all');
                 onSearchChange('');
               }}
-              className="px-2.5 py-1.5 text-xs text-rose-400 hover:text-rose-300 bg-rose-500/10 rounded-xl border border-rose-500/20 transition-colors"
+              className="px-2.5 py-1.5 text-xs text-rose-400 hover:text-rose-300 bg-rose-500/10 rounded-xl border border-rose-500/20 transition-colors cursor-pointer"
             >
               Reset Filters
             </button>
@@ -208,7 +212,7 @@ export const EditableTable: React.FC<EditableTableProps> = ({
       </div>
 
       {/* Table Area */}
-      <div className="overflow-x-auto custom-scrollbar">
+      <div className="overflow-x-auto custom-scrollbar min-w-0 max-w-full">
         {sortedGames.length === 0 ? (
           <div className="p-12 text-center text-slate-500 space-y-3">
             <Gamepad2 className="w-12 h-12 mx-auto text-slate-600 opacity-60" />
@@ -218,7 +222,7 @@ export const EditableTable: React.FC<EditableTableProps> = ({
         ) : (
           <table className="w-full text-left border-collapse" id="backlog-editable-table">
             <thead>
-              <tr className="border-b border-slate-800 bg-slate-950/60 text-[11px] font-semibold text-slate-400 uppercase tracking-wider select-none">
+              <tr className="border-b text-[11px] font-semibold text-slate-400 uppercase tracking-wider select-none" style={{ backgroundColor: 'var(--theme-bg)', borderColor: 'var(--theme-border)' }}>
                 <th className="py-3 px-3 text-center w-10">★</th>
                 <th className="py-3 px-2 w-14 text-center">Cover</th>
                 
@@ -331,12 +335,15 @@ export const EditableTable: React.FC<EditableTableProps> = ({
                         {game.title}
                       </span>
                       {game.releaseYear && (
-                        <span className="text-[10px] text-slate-400 font-mono bg-slate-800 px-1.5 py-0.2 rounded border border-slate-700">
+                        <span
+                          className="text-[10px] text-slate-300 font-mono px-1.5 py-0.2 rounded border"
+                          style={{ backgroundColor: 'var(--theme-input)', borderColor: 'var(--theme-border)' }}
+                        >
                           {game.releaseYear}
                         </span>
                       )}
                     </div>
-                    <div className="text-[11px] text-indigo-300/80 mt-0.5 font-medium">
+                    <div className="text-[11px] theme-accent-text mt-0.5 font-medium opacity-90">
                       {game.genre}
                     </div>
                     {game.synopsis && (
@@ -348,7 +355,10 @@ export const EditableTable: React.FC<EditableTableProps> = ({
 
                   {/* Platform */}
                   <td className="py-3 px-4 whitespace-nowrap">
-                    <span className="px-2 py-0.5 rounded-md bg-slate-800 text-slate-300 font-mono text-[11px] border border-slate-700">
+                    <span
+                      className="px-2 py-0.5 rounded-md text-slate-300 font-mono text-[11px] border"
+                      style={{ backgroundColor: 'var(--theme-input)', borderColor: 'var(--theme-border)' }}
+                    >
                       {game.platform}
                     </span>
                   </td>
@@ -467,7 +477,10 @@ export const EditableTable: React.FC<EditableTableProps> = ({
       </div>
 
       {/* Footer Info */}
-      <div className="p-3 bg-slate-950/60 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400 font-mono">
+      <div
+        className="p-3 border-t flex items-center justify-between text-xs text-slate-400 font-mono"
+        style={{ backgroundColor: 'var(--theme-bg)', borderColor: 'var(--theme-border)' }}
+      >
         <div>
           Showing <span className="text-slate-200 font-bold">{sortedGames.length}</span> of {games.length} games
         </div>

@@ -92,26 +92,27 @@ export const PasscodeLockModal: React.FC<PasscodeLockModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/95 backdrop-blur-md p-4 animate-fade-in select-none">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-md p-4 animate-fade-in select-none overflow-hidden max-w-full">
       
       {/* Background Decorative Neon Glows */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[500px] h-[300px] bg-indigo-600/15 blur-[120px] rounded-full pointer-events-none" />
-      <div className="absolute bottom-10 right-1/4 w-[300px] h-[200px] bg-purple-600/10 blur-[100px] rounded-full pointer-events-none" />
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[500px] h-[300px] bg-[#EE4540]/15 blur-[120px] rounded-full pointer-events-none" />
+      <div className="absolute bottom-10 right-1/4 w-[300px] h-[200px] bg-[#801336]/20 blur-[100px] rounded-full pointer-events-none" />
 
       <div
-        className={`relative w-full max-w-md bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden transition-all duration-300 ${
-          isShaking ? 'animate-bounce border-rose-500/80 shadow-rose-900/30' : 'shadow-indigo-950/40'
+        className={`relative w-full max-w-md rounded-2xl border shadow-2xl overflow-hidden transition-all duration-300 ${
+          isShaking ? 'animate-bounce border-rose-500/80 shadow-rose-900/30' : ''
         }`}
+        style={{ backgroundColor: 'var(--theme-surface)', borderColor: 'var(--theme-border)' }}
         id="passcode-lock-card"
       >
         {/* Top Header Badge */}
-        <div className="bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 p-6 text-center border-b border-slate-800/80 relative">
-          <div className="inline-flex p-3 rounded-2xl bg-indigo-600/20 border border-indigo-500/30 text-indigo-400 mb-3 shadow-lg shadow-indigo-600/20">
+        <div className="p-6 text-center border-b relative" style={{ backgroundColor: 'var(--theme-bg)', borderColor: 'var(--theme-border)' }}>
+          <div className="inline-flex p-3 rounded-2xl theme-accent-bg/20 border border-amber-500/30 theme-accent-text mb-3 shadow-lg">
             <Lock className="w-8 h-8" />
           </div>
 
           <h2 className="text-xl font-extrabold text-slate-100 tracking-tight flex items-center justify-center gap-2">
-            <Gamepad2 className="w-5 h-5 text-indigo-400" />
+            <Gamepad2 className="w-5 h-5 theme-accent-text" />
             <span>Master Passcode Vault</span>
           </h2>
           
@@ -119,7 +120,7 @@ export const PasscodeLockModal: React.FC<PasscodeLockModalProps> = ({
             Private Backlog Protection enabled. Enter passcode to access your games.
           </p>
 
-          <div className="mt-3 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-950/80 border border-slate-800 text-[11px] font-mono text-indigo-300">
+          <div className="mt-3 inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-[11px] font-mono text-slate-300" style={{ backgroundColor: 'var(--theme-input)', borderColor: 'var(--theme-border)' }}>
             <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
             <span>Security: Cloud Sync Active</span>
           </div>
@@ -138,7 +139,7 @@ export const PasscodeLockModal: React.FC<PasscodeLockModalProps> = ({
                 
                 <div className="relative flex items-center">
                   <div className="absolute left-3 text-slate-500">
-                    <KeyRound className="w-4 h-4 text-indigo-400" />
+                    <KeyRound className="w-4 h-4 theme-accent-text" />
                   </div>
                   <input
                     type={showPasscode ? 'text' : 'password'}
@@ -149,7 +150,8 @@ export const PasscodeLockModal: React.FC<PasscodeLockModalProps> = ({
                     }}
                     placeholder="Enter passcode..."
                     autoFocus
-                    className="w-full pl-9 pr-10 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-center font-mono font-bold text-lg text-slate-100 tracking-widest focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                    className="w-full pl-9 pr-10 py-2.5 border rounded-xl text-center font-mono font-bold text-lg text-slate-100 tracking-widest focus:outline-none"
+                    style={{ backgroundColor: 'var(--theme-input)', borderColor: 'var(--theme-border)' }}
                     id="input-passcode-field"
                   />
                   <button
@@ -177,7 +179,8 @@ export const PasscodeLockModal: React.FC<PasscodeLockModalProps> = ({
                     key={`keypad-${digit}`}
                     type="button"
                     onClick={() => handleKeyPadClick(digit)}
-                    className="py-2.5 rounded-xl bg-slate-950/80 hover:bg-slate-800 border border-slate-800 text-slate-200 font-mono text-base font-bold transition-all active:scale-95 cursor-pointer"
+                    className="py-2.5 rounded-xl border text-slate-200 font-mono text-base font-bold transition-all active:scale-95 cursor-pointer"
+                    style={{ backgroundColor: 'var(--theme-input)', borderColor: 'var(--theme-border)' }}
                   >
                     {digit}
                   </button>
@@ -185,21 +188,24 @@ export const PasscodeLockModal: React.FC<PasscodeLockModalProps> = ({
                 <button
                   type="button"
                   onClick={handleClear}
-                  className="py-2.5 rounded-xl bg-slate-950/50 hover:bg-slate-800 border border-slate-800 text-slate-400 text-xs font-semibold transition-all cursor-pointer"
+                  className="py-2.5 rounded-xl border text-slate-400 text-xs font-semibold transition-all cursor-pointer"
+                  style={{ backgroundColor: 'var(--theme-input)', borderColor: 'var(--theme-border)' }}
                 >
                   Clear
                 </button>
                 <button
                   type="button"
                   onClick={() => handleKeyPadClick('0')}
-                  className="py-2.5 rounded-xl bg-slate-950/80 hover:bg-slate-800 border border-slate-800 text-slate-200 font-mono text-base font-bold transition-all active:scale-95 cursor-pointer"
+                  className="py-2.5 rounded-xl border text-slate-200 font-mono text-base font-bold transition-all active:scale-95 cursor-pointer"
+                  style={{ backgroundColor: 'var(--theme-input)', borderColor: 'var(--theme-border)' }}
                 >
                   0
                 </button>
                 <button
                   type="button"
                   onClick={handleBackspace}
-                  className="py-2.5 rounded-xl bg-slate-950/50 hover:bg-slate-800 border border-slate-800 text-slate-400 text-xs font-semibold transition-all cursor-pointer"
+                  className="py-2.5 rounded-xl border text-slate-400 text-xs font-semibold transition-all cursor-pointer"
+                  style={{ backgroundColor: 'var(--theme-input)', borderColor: 'var(--theme-border)' }}
                 >
                   ⌫
                 </button>
@@ -208,7 +214,7 @@ export const PasscodeLockModal: React.FC<PasscodeLockModalProps> = ({
               {/* Submit unlock button */}
               <button
                 type="submit"
-                className="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm rounded-xl transition-all shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-2 cursor-pointer active:scale-98"
+                className="w-full py-3 px-4 theme-accent-bg hover:opacity-90 text-white font-bold text-sm rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer active:scale-98"
                 id="btn-unlock-vault"
               >
                 <Unlock className="w-4 h-4" />
@@ -216,16 +222,16 @@ export const PasscodeLockModal: React.FC<PasscodeLockModalProps> = ({
               </button>
 
               {/* Default Passcode Hint / Info */}
-              <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-400">
+              <div className="pt-2 border-t flex items-center justify-between text-xs text-slate-400" style={{ borderColor: 'var(--theme-border)' }}>
                 <div className="flex items-center gap-1.5 text-slate-400">
-                  <Sparkles className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
-                  <span>Default Passcode: <code className="font-mono bg-slate-950 px-1.5 py-0.5 rounded text-indigo-300 font-bold">1234</code></span>
+                  <Sparkles className="w-3.5 h-3.5 theme-accent-text shrink-0" />
+                  <span>Default Passcode: <code className="font-mono px-1.5 py-0.5 rounded text-slate-200 font-bold" style={{ backgroundColor: 'var(--theme-input)' }}>1234</code></span>
                 </div>
 
                 <button
                   type="button"
                   onClick={() => setShowChangePasscode(true)}
-                  className="text-xs text-indigo-400 hover:text-indigo-300 underline font-medium cursor-pointer"
+                  className="text-xs theme-accent-text hover:opacity-80 underline font-medium cursor-pointer"
                 >
                   Change Passcode
                 </button>

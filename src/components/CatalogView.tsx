@@ -118,17 +118,18 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
   return (
     <div className="space-y-4">
       {/* Search & Filter Header Toolbar */}
-      <div className="p-4 bg-slate-900 border border-slate-800 rounded-2xl shadow-xl flex flex-wrap items-center justify-between gap-3">
+      <div className="p-3 sm:p-4 border rounded-2xl shadow-xl flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 min-w-0 w-full" style={{ backgroundColor: 'var(--theme-surface)', borderColor: 'var(--theme-border)' }}>
         
         {/* Search Input */}
-        <div className="flex items-center gap-2 flex-1 min-w-[240px]">
+        <div className="flex items-center gap-2 flex-1 min-w-0 w-full">
           <div className="relative w-full">
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
               placeholder="🔍 Search catalog titles, genre, or platform..."
-              className="w-full pl-3 pr-8 py-2 bg-slate-950 border border-slate-700/80 rounded-xl text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+              className="w-full pl-3 pr-8 py-2 border rounded-xl text-xs text-slate-100 placeholder-slate-500 focus:outline-none"
+              style={{ backgroundColor: 'var(--theme-input)', borderColor: 'var(--theme-border)' }}
               id="catalog-search-input"
             />
             {searchQuery && (
@@ -143,13 +144,14 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
         </div>
 
         {/* Filter Selects & Sort Controls */}
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto min-w-0">
           
           {/* Status Filter */}
           <select
             value={selectedStatus}
             onChange={(e) => onStatusChange(e.target.value)}
-            className="px-3 py-1.5 bg-slate-950 border border-slate-700 rounded-xl text-xs text-slate-200 focus:outline-none focus:border-indigo-500 cursor-pointer"
+            className="flex-1 sm:flex-none min-w-[110px] px-2.5 sm:px-3 py-1.5 border rounded-xl text-xs text-slate-200 focus:outline-none cursor-pointer"
+            style={{ backgroundColor: 'var(--theme-input)', borderColor: 'var(--theme-border)' }}
             id="catalog-filter-status"
           >
             <option value="all">All Statuses</option>
@@ -164,7 +166,8 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
           <select
             value={selectedGrade}
             onChange={(e) => onGradeChange(e.target.value)}
-            className="px-3 py-1.5 bg-slate-950 border border-slate-700 rounded-xl text-xs text-slate-200 focus:outline-none focus:border-indigo-500 cursor-pointer"
+            className="flex-1 sm:flex-none min-w-[100px] px-2.5 sm:px-3 py-1.5 border rounded-xl text-xs text-slate-200 focus:outline-none cursor-pointer"
+            style={{ backgroundColor: 'var(--theme-input)', borderColor: 'var(--theme-border)' }}
             id="catalog-filter-grade"
           >
             <option value="all">All Grades</option>
@@ -179,7 +182,8 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
           <select
             value={selectedPlatform}
             onChange={(e) => onPlatformChange(e.target.value)}
-            className="px-3 py-1.5 bg-slate-950 border border-slate-700 rounded-xl text-xs text-slate-200 focus:outline-none focus:border-indigo-500 cursor-pointer"
+            className="flex-1 sm:flex-none min-w-[110px] px-2.5 sm:px-3 py-1.5 border rounded-xl text-xs text-slate-200 focus:outline-none cursor-pointer"
+            style={{ backgroundColor: 'var(--theme-input)', borderColor: 'var(--theme-border)' }}
             id="catalog-filter-platform"
           >
             <option value="all">All Platforms</option>
@@ -194,7 +198,8 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
           <select
             value={sortField}
             onChange={(e) => setSortField(e.target.value as SortField)}
-            className="px-3 py-1.5 bg-slate-950 border border-slate-700 rounded-xl text-xs text-indigo-300 font-medium focus:outline-none focus:border-indigo-500 cursor-pointer"
+            className="px-3 py-1.5 border rounded-xl text-xs theme-accent-text font-medium focus:outline-none cursor-pointer"
+            style={{ backgroundColor: 'var(--theme-input)', borderColor: 'var(--theme-border)' }}
             id="catalog-sort-field"
           >
             <option value="createdAt">Sort: Date Added</option>
@@ -207,17 +212,18 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
 
           <button
             onClick={() => setSortOrder(prev => (prev === 'asc' ? 'desc' : 'asc'))}
-            className="p-2 bg-slate-950 border border-slate-700 rounded-xl text-slate-300 hover:text-white transition-colors cursor-pointer"
+            className="p-2 border rounded-xl text-slate-300 hover:text-white transition-colors cursor-pointer"
+            style={{ backgroundColor: 'var(--theme-input)', borderColor: 'var(--theme-border)' }}
             title={`Sort Order: ${sortOrder.toUpperCase()}`}
           >
-            {sortOrder === 'asc' ? <ArrowUp className="w-3.5 h-3.5 text-indigo-400" /> : <ArrowDown className="w-3.5 h-3.5 text-indigo-400" />}
+            {sortOrder === 'asc' ? <ArrowUp className="w-3.5 h-3.5 theme-accent-text" /> : <ArrowDown className="w-3.5 h-3.5 theme-accent-text" />}
           </button>
 
           {/* Web Scrape Game Lookup Trigger */}
           {onOpenWebSearchModal && (
             <button
               onClick={onOpenWebSearchModal}
-              className="py-1.5 px-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 shadow-lg shadow-indigo-600/25 transition-all cursor-pointer"
+              className="py-1.5 px-3 theme-gradient-btn hover:opacity-90 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 shadow-lg transition-all cursor-pointer"
               id="catalog-web-scrape-btn"
             >
               <Globe className="w-3.5 h-3.5" />
@@ -230,7 +236,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
 
       {/* Catalog Grid View */}
       {sortedGames.length === 0 ? (
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-12 text-center text-slate-500 space-y-4 shadow-xl">
+        <div className="border rounded-2xl p-12 text-center text-slate-500 space-y-4 shadow-xl" style={{ backgroundColor: 'var(--theme-surface)', borderColor: 'var(--theme-border)' }}>
           <Gamepad2 className="w-12 h-12 mx-auto text-slate-600 opacity-60" />
           <p className="text-sm font-medium text-slate-400">No game covers match your active filter.</p>
           <div className="flex justify-center gap-3">
@@ -241,14 +247,15 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
                 onPlatformChange('all');
                 onSearchChange('');
               }}
-              className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs rounded-xl border border-slate-700 transition-colors"
+              className="px-3 py-1.5 hover:bg-slate-800 text-slate-200 text-xs rounded-xl border transition-colors cursor-pointer"
+              style={{ backgroundColor: 'var(--theme-bg)', borderColor: 'var(--theme-border)' }}
             >
               Clear Catalog Filters
             </button>
             {onOpenWebSearchModal && (
               <button
                 onClick={onOpenWebSearchModal}
-                className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium rounded-xl transition-colors"
+                className="px-3 py-1.5 theme-accent-bg hover:opacity-90 text-white text-xs font-medium rounded-xl transition-colors cursor-pointer"
               >
                 Scrape Game Info from Web
               </button>
@@ -260,11 +267,12 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
           {sortedGames.map((game) => (
             <div
               key={game.id}
-              className="group relative bg-slate-900 border border-slate-800 hover:border-indigo-500/60 rounded-2xl overflow-hidden flex flex-col justify-between shadow-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-indigo-500/10"
+              className="group relative border rounded-2xl overflow-hidden flex flex-col justify-between shadow-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl"
+              style={{ backgroundColor: 'var(--theme-surface)', borderColor: 'var(--theme-border)' }}
               id={`catalog-card-${game.id}`}
             >
               {/* Cover Art Box (3:4 Poster Aspect Ratio) */}
-              <div className="relative aspect-[3/4] w-full overflow-hidden bg-slate-950">
+              <div className="relative aspect-[3/4] w-full overflow-hidden bg-[#100612]">
                 <img
                   src={game.coverUrl || getFallbackCover(game.title)}
                   alt={game.title}
@@ -276,7 +284,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
                 />
 
                 {/* Gradient Dark Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent opacity-80 group-hover:opacity-90 transition-opacity" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#100612] via-[#100612]/20 to-transparent opacity-80 group-hover:opacity-90 transition-opacity" />
 
                 {/* Top Left: Completion Status Badge */}
                 <div className="absolute top-2.5 left-2.5 z-10">
@@ -296,7 +304,8 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
                       e.stopPropagation();
                       onUpdateGame(game.id, { favorite: !game.favorite });
                     }}
-                    className="p-1 rounded-lg bg-slate-950/70 hover:bg-slate-900 border border-slate-800 text-slate-400 hover:text-amber-400 transition-colors backdrop-blur-md cursor-pointer"
+                    className="p-1 rounded-lg border text-slate-400 hover:text-amber-400 transition-colors backdrop-blur-md cursor-pointer"
+                    style={{ backgroundColor: 'var(--theme-input)', borderColor: 'var(--theme-border)' }}
                     title={game.favorite ? 'Unmark Favorite' : 'Mark Favorite'}
                   >
                     <Star
@@ -317,17 +326,20 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
 
                 {/* Bottom Overlay Info on Poster */}
                 <div className="absolute bottom-2 left-2.5 right-2.5 z-10 space-y-1">
-                  <div className="flex items-center justify-between text-[10px] font-mono font-bold tracking-wider text-indigo-300/90">
+                  <div className="flex items-center justify-between text-[10px] font-mono font-bold tracking-wider text-slate-300">
                     <span className="truncate">{game.genre}</span>
                     {game.releaseYear && (
-                      <span className="text-slate-300 font-semibold shrink-0 bg-slate-900/90 px-1.5 py-0.5 rounded border border-slate-700/80">
+                      <span
+                        className="text-slate-300 font-semibold shrink-0 px-1.5 py-0.5 rounded border"
+                        style={{ backgroundColor: 'var(--theme-input)', borderColor: 'var(--theme-border)' }}
+                      >
                         {game.releaseYear}
                       </span>
                     )}
                   </div>
                   <h3
                     onClick={() => onEditModalOpen(game)}
-                    className="font-bold text-slate-100 text-xs sm:text-sm leading-tight line-clamp-2 hover:text-indigo-300 transition-colors cursor-pointer"
+                    className="font-bold text-slate-100 text-xs sm:text-sm leading-tight line-clamp-2 hover:opacity-80 transition-colors cursor-pointer"
                     title={game.title}
                   >
                     {game.title}
@@ -341,20 +353,26 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
               </div>
 
               {/* Card Footer Bar */}
-              <div className="p-2.5 bg-slate-950 border-t border-slate-800/80 flex items-center justify-between text-[11px] font-mono text-slate-400">
-                <span className="truncate max-w-[100px] text-slate-400 text-[10px] font-semibold bg-slate-900 px-1.5 py-0.5 rounded border border-slate-800">
+              <div
+                className="p-2.5 border-t flex items-center justify-between text-[11px] font-mono text-slate-400"
+                style={{ backgroundColor: 'var(--theme-input)', borderColor: 'var(--theme-border)' }}
+              >
+                <span
+                  className="truncate max-w-[100px] text-slate-300 text-[10px] font-semibold px-1.5 py-0.5 rounded border"
+                  style={{ backgroundColor: 'var(--theme-bg)', borderColor: 'var(--theme-border)' }}
+                >
                   {game.platform}
                 </span>
 
                 <div className="flex items-center gap-2">
-                  <span className="text-cyan-400 font-bold flex items-center gap-0.5">
-                    <Clock className="w-3 h-3 text-cyan-400" />
+                  <span className="theme-accent-text font-bold flex items-center gap-0.5">
+                    <Clock className="w-3 h-3 theme-accent-text" />
                     {game.hoursPlayed}h
                   </span>
 
                   <button
                     onClick={() => onEditModalOpen(game)}
-                    className="p-1 rounded text-slate-400 hover:text-indigo-400 hover:bg-slate-900 transition-colors cursor-pointer"
+                    className="p-1 rounded text-slate-400 hover:text-slate-100 transition-colors cursor-pointer"
                     title="Edit Entry"
                   >
                     <Edit3 className="w-3.5 h-3.5" />
@@ -367,7 +385,10 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
       )}
 
       {/* Footer Counter */}
-      <div className="p-3 bg-slate-900/60 border border-slate-800 rounded-xl flex items-center justify-between text-xs text-slate-400 font-mono">
+      <div
+        className="p-3 border rounded-xl flex items-center justify-between text-xs text-slate-400 font-mono"
+        style={{ backgroundColor: 'var(--theme-surface)', borderColor: 'var(--theme-border)' }}
+      >
         <div>
           Catalog displaying <span className="text-slate-100 font-bold">{sortedGames.length}</span> cover art cards
         </div>

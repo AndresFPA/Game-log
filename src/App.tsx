@@ -4,7 +4,8 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { GameEntry } from './types';
+import { GameEntry, AppTheme, THEME_CONFIGS } from './types';
+import { ThemeSelector } from './components/ThemeSelector';
 import {
   loadGamesFromStorage,
   saveGamesToStorage,
@@ -49,6 +50,16 @@ export default function App() {
   const [games, setGames] = useState<GameEntry[]>([]);
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(true);
   const [isCloudLoading, setIsCloudLoading] = useState<boolean>(true);
+
+  // App Theme State ('crimson' | 'violet' | 'midnight')
+  const [theme, setTheme] = useState<AppTheme>(() => {
+    return (localStorage.getItem('game_log_theme') as AppTheme) || 'crimson';
+  });
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('game_log_theme', theme);
+  }, [theme]);
   
   // Security & Passcode State (Starts locked every time app opens or reloads)
   const [isUnlocked, setIsUnlocked] = useState<boolean>(false);
@@ -251,52 +262,57 @@ export default function App() {
   });
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-indigo-500 selection:text-white">
+    <div className="min-h-screen text-slate-100 flex flex-col font-sans w-full max-w-full overflow-x-hidden" style={{ backgroundColor: 'var(--theme-bg)' }}>
       
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="fixed top-4 right-4 z-50 bg-slate-900 border border-indigo-500/40 text-slate-100 px-4 py-3 rounded-xl shadow-2xl flex items-center gap-2 text-xs font-medium animate-slide-down">
+        <div className="fixed top-4 right-4 z-50 theme-surface-bg border text-slate-100 px-4 py-3 rounded-xl shadow-2xl flex items-center gap-2 text-xs font-medium animate-slide-down max-w-[calc(100vw-2rem)]" style={{ borderColor: 'var(--theme-border)' }}>
           <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-          <span>{toastMessage}</span>
+          <span className="truncate">{toastMessage}</span>
         </div>
       )}
 
       {/* Streamlit Top Header Bar */}
-      <header className={`sticky top-0 z-30 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-4 py-3 transition-all duration-300 ${
+      <header className={`sticky top-0 z-40 backdrop-blur-md border-b px-2.5 sm:px-4 py-2.5 sm:py-3 transition-all duration-300 w-full max-w-full ${
         sidebarOpen ? 'lg:pl-[336px]' : 'lg:pl-4'
-      }`}>
-        <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
+      }`} style={{ backgroundColor: 'var(--theme-header-bg)', borderColor: 'var(--theme-border)' }}>
+        <div className="max-w-7xl mx-auto flex items-center justify-between gap-2 sm:gap-4 min-w-0">
           
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className={`p-2 rounded-xl transition-all cursor-pointer flex items-center gap-1.5 text-xs font-semibold ${
+              className={`p-2 rounded-xl transition-all cursor-pointer flex items-center gap-1.5 text-xs font-semibold shrink-0 ${
                 sidebarOpen
-                  ? 'bg-indigo-900/60 text-indigo-300 border border-indigo-500/50 shadow-inner'
-                  : 'bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700'
+                  ? 'text-slate-100 shadow-inner'
+                  : 'text-slate-300'
               }`}
+              style={{
+                backgroundColor: sidebarOpen ? 'var(--theme-accent-subtle)' : 'var(--theme-surface)',
+                borderColor: 'var(--theme-border)',
+                borderWidth: '1px'
+              }}
               title={sidebarOpen ? "Hide Sidebar" : "Show Sidebar"}
               id="toggle-sidebar-button"
             >
-              <Menu className="w-5 h-5 text-indigo-400" />
+              <Menu className="w-5 h-5 theme-accent-text" />
               <span className="hidden sm:inline text-[11px] uppercase tracking-wider">{sidebarOpen ? 'Sidebar' : 'Sidebar'}</span>
             </button>
 
-            <div className="flex items-center gap-2.5">
-              <div className="p-2 rounded-xl bg-indigo-600 text-white shadow-lg shadow-indigo-600/30">
-                <Gamepad2 className="w-5 h-5" />
+            <div className="flex items-center gap-2 min-w-0">
+              <div className="p-1.5 sm:p-2 rounded-xl theme-gradient-btn text-white shadow-lg shrink-0">
+                <Gamepad2 className="w-4 h-4 sm:w-5 sm:h-5" />
               </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <h1 className="font-bold text-slate-100 text-base leading-none tracking-tight">
+              <div className="min-w-0">
+                <div className="flex items-center gap-1.5 min-w-0">
+                  <h1 className="font-bold text-slate-100 text-sm sm:text-base leading-none tracking-tight truncate">
                     Game Log
                   </h1>
-                  <div className="flex items-center gap-1 text-[10px] font-mono text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full" title="Real-time Firebase Cloud Storage Active">
-                    <Cloud className="w-3 h-3 text-emerald-400 animate-pulse" />
+                  <div className="hidden xs:flex items-center gap-1 text-[9px] sm:text-[10px] font-mono text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-1.5 py-0.5 rounded-full shrink-0" title="Real-time Firebase Cloud Storage Active">
+                    <Cloud className="w-2.5 h-2.5 text-emerald-400 animate-pulse" />
                     <span className="hidden sm:inline">Firebase Cloud</span>
                   </div>
                 </div>
-                <p className="text-[11px] text-slate-400 mt-1 font-mono">
+                <p className="text-[10px] sm:text-[11px] text-slate-400 mt-0.5 font-mono truncate">
                   Games
                 </p>
               </div>
@@ -304,12 +320,12 @@ export default function App() {
           </div>
 
           {/* View Switcher & Actions */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             
             {/* Web Search Trigger */}
             <button
               onClick={() => setWebSearchOpen(true)}
-              className="hidden sm:flex py-1.5 px-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white rounded-xl text-xs font-semibold items-center gap-1.5 shadow-md shadow-indigo-600/20 transition-all cursor-pointer"
+              className="hidden sm:flex py-1.5 px-3 theme-gradient-btn hover:opacity-90 text-white rounded-xl text-xs font-semibold items-center gap-1.5 shadow-md transition-all cursor-pointer"
               id="header-web-scrape-btn"
             >
               <Globe className="w-4 h-4" />
@@ -317,28 +333,30 @@ export default function App() {
             </button>
 
             {/* View Modes Switcher */}
-            <div className="bg-slate-950 p-1 rounded-xl border border-slate-800 flex items-center gap-1">
+            <div className="p-1 rounded-xl border flex items-center gap-0.5 sm:gap-1" style={{ backgroundColor: 'var(--theme-input)', borderColor: 'var(--theme-border)' }}>
               <button
                 onClick={() => setViewMode('catalog')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer ${
+                className={`px-2 sm:px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1 transition-colors cursor-pointer ${
                   viewMode === 'catalog'
-                    ? 'bg-indigo-600 text-white shadow-sm font-semibold'
+                    ? 'theme-accent-bg text-white shadow-sm font-semibold'
                     : 'text-slate-400 hover:text-slate-200'
                 }`}
                 id="view-mode-catalog-btn"
+                title="Catalog View"
               >
                 <Library className="w-3.5 h-3.5" />
-                <span>Catalog</span>
+                <span className="hidden sm:inline">Catalog</span>
               </button>
 
               <button
                 onClick={() => setViewMode('table')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer ${
+                className={`px-2 sm:px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1 transition-colors cursor-pointer ${
                   viewMode === 'table'
-                    ? 'bg-indigo-600 text-white shadow-sm font-semibold'
+                    ? 'theme-accent-bg text-white shadow-sm font-semibold'
                     : 'text-slate-400 hover:text-slate-200'
                 }`}
                 id="view-mode-table-btn"
+                title="Table View"
               >
                 <TableIcon className="w-3.5 h-3.5" />
                 <span className="hidden md:inline">Table</span>
@@ -346,12 +364,13 @@ export default function App() {
 
               <button
                 onClick={() => setViewMode('cards')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer ${
+                className={`px-2 sm:px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1 transition-colors cursor-pointer ${
                   viewMode === 'cards'
-                    ? 'bg-indigo-600 text-white shadow-sm font-semibold'
+                    ? 'theme-accent-bg text-white shadow-sm font-semibold'
                     : 'text-slate-400 hover:text-slate-200'
                 }`}
                 id="view-mode-cards-btn"
+                title="Card Grid View"
               >
                 <LayoutGrid className="w-3.5 h-3.5" />
                 <span className="hidden md:inline">Cards</span>
@@ -359,12 +378,13 @@ export default function App() {
 
               <button
                 onClick={() => setViewMode('analytics')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer ${
+                className={`px-2 sm:px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1 transition-colors cursor-pointer ${
                   viewMode === 'analytics'
-                    ? 'bg-indigo-600 text-white shadow-sm font-semibold'
+                    ? 'theme-accent-bg text-white shadow-sm font-semibold'
                     : 'text-slate-400 hover:text-slate-200'
                 }`}
                 id="view-mode-analytics-btn"
+                title="Analytics View"
               >
                 <BarChart2 className="w-3.5 h-3.5" />
                 <span className="hidden md:inline">Stats</span>
@@ -374,31 +394,40 @@ export default function App() {
             {/* Direct Export CSV Button */}
             <button
               onClick={handleExportCsv}
-              className="hidden xl:flex py-1.5 px-3 bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-slate-700 rounded-xl text-xs font-medium items-center gap-1.5 transition-colors cursor-pointer"
+              className="hidden xl:flex py-1.5 px-3 hover:bg-slate-800 text-slate-300 border rounded-xl text-xs font-medium items-center gap-1.5 transition-colors cursor-pointer"
+              style={{ backgroundColor: 'var(--theme-surface)', borderColor: 'var(--theme-border)' }}
               title="Download CSV Backup"
               id="header-export-csv-button"
             >
-              <Download className="w-4 h-4 text-cyan-400" />
+              <Download className="w-4 h-4 theme-accent-text" />
               <span>Export CSV</span>
             </button>
 
             {/* Lock App Vault Button */}
             <button
               onClick={handleLockApp}
-              className="py-1.5 px-2.5 bg-slate-900 hover:bg-rose-950/60 text-slate-300 hover:text-rose-300 border border-slate-700 hover:border-rose-800/80 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer"
+              className="p-1.5 sm:py-1.5 sm:px-2.5 hover:opacity-90 text-slate-300 border rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer shrink-0"
+              style={{ backgroundColor: 'var(--theme-surface)', borderColor: 'var(--theme-border)' }}
               title="Lock Application Vault"
               id="header-lock-app-btn"
             >
-              <Lock className="w-3.5 h-3.5 text-rose-400" />
+              <Lock className="w-3.5 h-3.5 theme-accent-text" />
               <span className="hidden sm:inline">Lock</span>
             </button>
+
+            {/* Theme Selector Dropdown */}
+            <ThemeSelector
+              currentTheme={theme}
+              onSelectTheme={setTheme}
+              variant="dropdown"
+            />
           </div>
 
         </div>
       </header>
 
       {/* Main Layout Area */}
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex overflow-x-hidden min-w-0 w-full max-w-full">
         
         {/* Streamlit Sidebar */}
         <Sidebar
@@ -411,11 +440,13 @@ export default function App() {
           totalGamesCount={games.length}
           onOpenWebSearchModal={() => setWebSearchOpen(true)}
           onLockApp={handleLockApp}
+          currentTheme={theme}
+          onSelectTheme={setTheme}
         />
 
         {/* Content Area */}
         <main
-          className={`flex-1 transition-all duration-300 overflow-y-auto p-4 sm:p-6 custom-scrollbar ${
+          className={`flex-1 transition-all duration-300 overflow-y-auto overflow-x-hidden p-3 sm:p-6 custom-scrollbar min-w-0 w-full max-w-full ${
             sidebarOpen ? 'lg:pl-[340px]' : 'lg:pl-6'
           }`}
         >

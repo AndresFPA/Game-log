@@ -86,13 +86,19 @@ export const WebGameSearchModal: React.FC<WebGameSearchModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-2xl w-full shadow-2xl overflow-hidden animate-fade-in flex flex-col max-h-[85vh]">
+    <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 overflow-hidden max-w-full">
+      <div
+        className="border rounded-2xl max-w-2xl w-full shadow-2xl overflow-hidden animate-fade-in flex flex-col max-h-[85vh]"
+        style={{ backgroundColor: 'var(--theme-surface)', borderColor: 'var(--theme-border)' }}
+      >
         
         {/* Header */}
-        <div className="p-4 border-b border-slate-800 bg-slate-950/60 flex items-center justify-between">
+        <div
+          className="p-4 border-b flex items-center justify-between"
+          style={{ backgroundColor: 'var(--theme-bg)', borderColor: 'var(--theme-border)' }}
+        >
           <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-xl bg-indigo-600/20 text-indigo-400 border border-indigo-500/30">
+            <div className="p-2 rounded-xl theme-accent-bg/20 theme-accent-text border border-indigo-500/30">
               <Globe className="w-5 h-5" />
             </div>
             <div>
@@ -113,7 +119,10 @@ export const WebGameSearchModal: React.FC<WebGameSearchModalProps> = ({
         </div>
 
         {/* Search Bar Input Form */}
-        <div className="p-4 border-b border-slate-800 bg-slate-950/30">
+        <div
+          className="p-4 border-b"
+          style={{ backgroundColor: 'var(--theme-bg)', borderColor: 'var(--theme-border)' }}
+        >
           <form onSubmit={handleSearch} className="flex gap-2">
             <div className="relative flex-1">
               <input
@@ -121,7 +130,8 @@ export const WebGameSearchModal: React.FC<WebGameSearchModalProps> = ({
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Type any game title (e.g., Grand Theft Auto VI, Elden Ring, Zelda)..."
-                className="w-full pl-9 pr-4 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                className="w-full pl-9 pr-4 py-2.5 border rounded-xl text-sm text-slate-100 placeholder-slate-500 focus:outline-none"
+                style={{ backgroundColor: 'var(--theme-input)', borderColor: 'var(--theme-border)' }}
                 id="web-search-query-input"
               />
               <Search className="w-4 h-4 text-slate-500 absolute left-3 top-3" />
@@ -130,7 +140,7 @@ export const WebGameSearchModal: React.FC<WebGameSearchModalProps> = ({
             <button
               type="submit"
               disabled={loading || !query.trim()}
-              className="py-2.5 px-5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-medium text-xs rounded-xl shadow-lg shadow-indigo-600/20 transition-all flex items-center gap-2 cursor-pointer shrink-0"
+              className="py-2.5 px-5 theme-accent-bg hover:opacity-90 disabled:opacity-50 text-white font-medium text-xs rounded-xl shadow-lg transition-all flex items-center gap-2 cursor-pointer shrink-0"
               id="web-search-submit-btn"
             >
               {loading ? (

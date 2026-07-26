@@ -68,8 +68,8 @@ export const StatsView: React.FC<StatsViewProps> = ({ games }) => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         
         {/* Grade Tier Breakdown */}
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl">
-          <div className="flex items-center gap-2 mb-4 text-indigo-400 font-semibold text-sm uppercase tracking-wider">
+        <div className="border rounded-2xl p-5 shadow-xl" style={{ backgroundColor: 'var(--theme-surface)', borderColor: 'var(--theme-border)' }}>
+          <div className="flex items-center gap-2 mb-4 theme-accent-text font-semibold text-sm uppercase tracking-wider">
             <Trophy className="w-4 h-4" />
             <span>Grade Tier Distribution</span>
           </div>
@@ -90,7 +90,7 @@ export const StatsView: React.FC<StatsViewProps> = ({ games }) => {
                     </span>
                     <span className="text-slate-400">{count} games ({pct}%)</span>
                   </div>
-                  <div className="w-full bg-slate-950 rounded-full h-2 overflow-hidden border border-slate-800">
+                  <div className="w-full bg-slate-950/80 rounded-full h-2 overflow-hidden border border-slate-800">
                     <div
                       className={`h-full transition-all duration-500 ${
                         g === 'S' ? 'bg-purple-500' : g === 'A' ? 'bg-emerald-500' : g === 'B' ? 'bg-blue-500' : g === 'C' ? 'bg-amber-500' : 'bg-rose-500'
@@ -105,7 +105,7 @@ export const StatsView: React.FC<StatsViewProps> = ({ games }) => {
         </div>
 
         {/* Completion Status Distribution */}
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl">
+        <div className="border rounded-2xl p-5 shadow-xl" style={{ backgroundColor: 'var(--theme-surface)', borderColor: 'var(--theme-border)' }}>
           <div className="flex items-center gap-2 mb-4 text-emerald-400 font-semibold text-sm uppercase tracking-wider">
             <PieChart className="w-4 h-4" />
             <span>Backlog Status Breakdown</span>
@@ -122,7 +122,7 @@ export const StatsView: React.FC<StatsViewProps> = ({ games }) => {
                     <span className="text-slate-300 font-medium">{s}</span>
                     <span className="font-mono text-slate-400">{count} ({pct}%)</span>
                   </div>
-                  <div className="w-full bg-slate-950 rounded-full h-2 overflow-hidden border border-slate-800">
+                  <div className="w-full bg-slate-950/80 rounded-full h-2 overflow-hidden border border-slate-800">
                     <div
                       className={`h-full transition-all duration-500 ${
                         s === 'Completed' || s === 'Mastered'
@@ -150,7 +150,7 @@ export const StatsView: React.FC<StatsViewProps> = ({ games }) => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         
         {/* Top Platforms */}
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl">
+        <div className="border rounded-2xl p-5 shadow-xl" style={{ backgroundColor: 'var(--theme-surface)', borderColor: 'var(--theme-border)' }}>
           <div className="flex items-center gap-2 mb-4 text-cyan-400 font-semibold text-sm uppercase tracking-wider">
             <Gamepad2 className="w-4 h-4" />
             <span>Gaming Platforms</span>
@@ -158,7 +158,7 @@ export const StatsView: React.FC<StatsViewProps> = ({ games }) => {
 
           <div className="grid grid-cols-2 gap-2">
             {sortedPlatforms.map(([platform, count]) => (
-              <div key={platform} className="p-3 bg-slate-950 border border-slate-800 rounded-xl">
+              <div key={platform} className="p-3 border rounded-xl" style={{ backgroundColor: 'var(--theme-input)', borderColor: 'var(--theme-border)' }}>
                 <div className="text-xs font-mono text-slate-400 truncate">{platform}</div>
                 <div className="text-lg font-bold font-mono text-slate-100 mt-1">{count} games</div>
               </div>
@@ -167,7 +167,7 @@ export const StatsView: React.FC<StatsViewProps> = ({ games }) => {
         </div>
 
         {/* Most Played Games */}
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl">
+        <div className="border rounded-2xl p-5 shadow-xl" style={{ backgroundColor: 'var(--theme-surface)', borderColor: 'var(--theme-border)' }}>
           <div className="flex items-center gap-2 mb-4 text-amber-400 font-semibold text-sm uppercase tracking-wider">
             <Clock className="w-4 h-4" />
             <span>Most Hours Invested</span>
@@ -175,7 +175,7 @@ export const StatsView: React.FC<StatsViewProps> = ({ games }) => {
 
           <div className="space-y-2">
             {topPlayed.map((g, idx) => (
-              <div key={g.id} className="p-2.5 bg-slate-950 border border-slate-800/80 rounded-xl flex items-center justify-between">
+              <div key={g.id} className="p-2.5 border rounded-xl flex items-center justify-between" style={{ backgroundColor: 'var(--theme-input)', borderColor: 'var(--theme-border)' }}>
                 <div className="flex items-center gap-2.5 min-w-0">
                   <span className="w-5 h-5 rounded-full bg-slate-800 text-slate-400 font-mono text-xs flex items-center justify-center shrink-0">
                     {idx + 1}
@@ -185,7 +185,7 @@ export const StatsView: React.FC<StatsViewProps> = ({ games }) => {
                     <div className="text-[10px] text-slate-500">{g.platform}</div>
                   </div>
                 </div>
-                <div className="text-xs font-bold font-mono text-cyan-400 shrink-0">
+                <div className="text-xs font-bold font-mono theme-accent-text shrink-0">
                   {g.hoursPlayed} hrs
                 </div>
               </div>

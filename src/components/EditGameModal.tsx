@@ -97,11 +97,11 @@ export const EditGameModal: React.FC<EditGameModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full shadow-2xl overflow-hidden animate-fade-in">
+    <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-hidden max-w-full">
+      <div className="border rounded-2xl max-w-lg w-full shadow-2xl overflow-hidden animate-fade-in" style={{ backgroundColor: 'var(--theme-surface)', borderColor: 'var(--theme-border)' }}>
         
         {/* Header */}
-        <div className="p-4 border-b border-slate-800 bg-slate-950/50 flex items-center justify-between">
+        <div className="p-4 border-b flex items-center justify-between" style={{ backgroundColor: 'var(--theme-bg)', borderColor: 'var(--theme-border)' }}>
           <div className="flex items-center gap-2">
             <button
               type="button"
@@ -127,8 +127,8 @@ export const EditGameModal: React.FC<EditGameModalProps> = ({
         <form onSubmit={handleSave} className="p-5 space-y-4 max-h-[80vh] overflow-y-auto custom-scrollbar">
           
           {/* Cover Art Banner & URL Input */}
-          <div className="flex gap-4 items-start bg-slate-950 p-3 rounded-xl border border-slate-800">
-            <div className="w-20 h-28 shrink-0 rounded-lg overflow-hidden bg-slate-900 border border-slate-800 shadow-md">
+          <div className="flex gap-4 items-start p-3 rounded-xl border" style={{ backgroundColor: 'var(--theme-input)', borderColor: 'var(--theme-border)' }}>
+            <div className="w-20 h-28 shrink-0 rounded-lg overflow-hidden border shadow-md" style={{ backgroundColor: 'var(--theme-bg)', borderColor: 'var(--theme-border)' }}>
               <img
                 src={coverUrl || getFallbackCover(title)}
                 alt={title}
@@ -146,7 +146,7 @@ export const EditGameModal: React.FC<EditGameModalProps> = ({
                   type="button"
                   onClick={handleAutoScrape}
                   disabled={scraping || !title.trim()}
-                  className="text-[10px] text-indigo-400 hover:text-indigo-300 flex items-center gap-1 cursor-pointer disabled:opacity-50"
+                  className="text-[10px] theme-accent-text hover:opacity-80 flex items-center gap-1 cursor-pointer disabled:opacity-50"
                 >
                   {scraping ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
                   <span>Auto-Fetch Web Cover</span>
@@ -158,7 +158,8 @@ export const EditGameModal: React.FC<EditGameModalProps> = ({
                 value={coverUrl}
                 onChange={(e) => setCoverUrl(e.target.value)}
                 placeholder="https://images.unsplash.com/..."
-                className="w-full px-3 py-1.5 bg-slate-900 border border-slate-700/80 rounded-lg text-xs text-slate-100 focus:outline-none focus:border-indigo-500"
+                className="w-full px-3 py-1.5 border rounded-lg text-xs text-slate-100 focus:outline-none"
+                style={{ backgroundColor: 'var(--theme-bg)', borderColor: 'var(--theme-border)' }}
               />
               <p className="text-[10px] text-slate-500">
                 Paste direct URL or click Auto-Fetch to scrape official box art.
@@ -175,7 +176,8 @@ export const EditGameModal: React.FC<EditGameModalProps> = ({
               required
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-sm text-slate-100 focus:outline-none focus:border-indigo-500"
+              className="w-full px-3 py-2 border rounded-xl text-sm text-slate-100 focus:outline-none"
+              style={{ backgroundColor: 'var(--theme-input)', borderColor: 'var(--theme-border)' }}
             />
           </div>
 
@@ -189,7 +191,8 @@ export const EditGameModal: React.FC<EditGameModalProps> = ({
                 value={releaseYear}
                 onChange={(e) => setReleaseYear(e.target.value)}
                 placeholder="e.g. 2024"
-                className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-xs text-slate-100 focus:outline-none focus:border-indigo-500"
+                className="w-full px-3 py-2 border rounded-xl text-xs text-slate-100 focus:outline-none"
+                style={{ backgroundColor: 'var(--theme-input)', borderColor: 'var(--theme-border)' }}
               />
             </div>
 
@@ -200,7 +203,8 @@ export const EditGameModal: React.FC<EditGameModalProps> = ({
               <select
                 value={genre}
                 onChange={(e) => setGenre(e.target.value)}
-                className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-xs text-slate-100 focus:outline-none focus:border-indigo-500"
+                className="w-full px-3 py-2 border rounded-xl text-xs text-slate-100 focus:outline-none cursor-pointer"
+                style={{ backgroundColor: 'var(--theme-input)', borderColor: 'var(--theme-border)' }}
               >
                 {GENRE_OPTIONS.map(g => (
                   <option key={g} value={g}>{g}</option>
@@ -218,7 +222,8 @@ export const EditGameModal: React.FC<EditGameModalProps> = ({
               value={synopsis}
               onChange={(e) => setSynopsis(e.target.value)}
               placeholder="Game story & description..."
-              className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-xs text-slate-100 focus:outline-none focus:border-indigo-500 custom-scrollbar resize-none"
+              className="w-full px-3 py-2 border rounded-xl text-xs text-slate-100 focus:outline-none custom-scrollbar resize-none"
+              style={{ backgroundColor: 'var(--theme-input)', borderColor: 'var(--theme-border)' }}
             />
           </div>
 
@@ -229,7 +234,8 @@ export const EditGameModal: React.FC<EditGameModalProps> = ({
             <select
               value={platform}
               onChange={(e) => setPlatform(e.target.value)}
-              className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-xs text-slate-100 focus:outline-none focus:border-indigo-500"
+              className="w-full px-3 py-2 border rounded-xl text-xs text-slate-100 focus:outline-none cursor-pointer"
+              style={{ backgroundColor: 'var(--theme-input)', borderColor: 'var(--theme-border)' }}
             >
               {PLATFORM_OPTIONS.concat(platform && !PLATFORM_OPTIONS.includes(platform) ? [platform] : []).map(p => (
                 <option key={p} value={p}>{p}</option>
@@ -245,7 +251,8 @@ export const EditGameModal: React.FC<EditGameModalProps> = ({
               <select
                 value={status}
                 onChange={(e) => setStatus(e.target.value as CompletionStatus)}
-                className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-xs text-slate-100 focus:outline-none focus:border-indigo-500"
+                className="w-full px-3 py-2 border rounded-xl text-xs text-slate-100 focus:outline-none cursor-pointer"
+                style={{ backgroundColor: 'var(--theme-input)', borderColor: 'var(--theme-border)' }}
               >
                 {STATUS_OPTIONS.map(s => (
                   <option key={s} value={s}>{s}</option>
@@ -260,7 +267,8 @@ export const EditGameModal: React.FC<EditGameModalProps> = ({
               <select
                 value={grade}
                 onChange={(e) => setGrade(e.target.value as Grade)}
-                className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-xs font-mono font-bold text-slate-100 focus:outline-none focus:border-indigo-500"
+                className="w-full px-3 py-2 border rounded-xl text-xs font-mono font-bold text-slate-100 focus:outline-none cursor-pointer"
+                style={{ backgroundColor: 'var(--theme-input)', borderColor: 'var(--theme-border)' }}
               >
                 {GRADE_OPTIONS.map(g => (
                   <option key={g} value={g}>{g} Grade</option>
@@ -278,7 +286,8 @@ export const EditGameModal: React.FC<EditGameModalProps> = ({
                 type="date"
                 value={beatenDate}
                 onChange={(e) => setBeatenDate(e.target.value)}
-                className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-xs text-slate-100 font-mono focus:outline-none focus:border-indigo-500"
+                className="w-full px-3 py-2 border rounded-xl text-xs text-slate-100 font-mono focus:outline-none"
+                style={{ backgroundColor: 'var(--theme-input)', borderColor: 'var(--theme-border)' }}
               />
             </div>
 
@@ -292,12 +301,13 @@ export const EditGameModal: React.FC<EditGameModalProps> = ({
                 step="0.5"
                 value={hoursPlayed}
                 onChange={(e) => setHoursPlayed(parseFloat(e.target.value) || 0)}
-                className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-xs text-slate-100 font-mono focus:outline-none focus:border-indigo-500"
+                className="w-full px-3 py-2 border rounded-xl text-xs text-slate-100 font-mono focus:outline-none"
+                style={{ backgroundColor: 'var(--theme-input)', borderColor: 'var(--theme-border)' }}
               />
             </div>
           </div>
 
-          <div className="pt-3 border-t border-slate-800 flex items-center justify-between gap-3">
+          <div className="pt-3 border-t flex items-center justify-between gap-3" style={{ borderColor: 'var(--theme-border)' }}>
             <button
               type="button"
               onClick={() => {
@@ -314,13 +324,14 @@ export const EditGameModal: React.FC<EditGameModalProps> = ({
               <button
                 type="button"
                 onClick={onClose}
-                className="py-2 px-4 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-medium transition-colors cursor-pointer"
+                className="py-2 px-4 hover:bg-slate-800 text-slate-300 border rounded-xl text-xs font-medium transition-colors cursor-pointer"
+                style={{ backgroundColor: 'var(--theme-input)', borderColor: 'var(--theme-border)' }}
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="py-2 px-4 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-medium shadow-lg shadow-indigo-600/20 flex items-center gap-1.5 transition-colors cursor-pointer"
+                className="py-2 px-4 theme-accent-bg hover:opacity-90 text-white rounded-xl text-xs font-medium shadow-lg flex items-center gap-1.5 transition-colors cursor-pointer"
               >
                 <Save className="w-4 h-4" />
                 <span>Save Changes</span>

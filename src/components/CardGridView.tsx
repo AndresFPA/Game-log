@@ -25,7 +25,7 @@ export const CardGridView: React.FC<CardGridViewProps> = ({
   const getGradeBadge = (grade: Grade) => {
     switch (grade) {
       case 'S':
-        return 'bg-purple-950/90 text-purple-200 border-purple-600/80 shadow-md shadow-purple-500/20';
+        return 'bg-[#801336]/90 text-rose-100 border-[#EE4540]/80 shadow-md shadow-[#EE4540]/20';
       case 'A':
         return 'bg-emerald-950/90 text-emerald-200 border-emerald-600/80';
       case 'B':
@@ -37,7 +37,7 @@ export const CardGridView: React.FC<CardGridViewProps> = ({
       case 'F':
         return 'bg-rose-950/90 text-rose-200 border-rose-600/80';
       default:
-        return 'bg-slate-800 text-slate-400 border-slate-700';
+        return 'bg-[#100612] text-slate-400 border-rose-950';
     }
   };
 
@@ -49,11 +49,11 @@ export const CardGridView: React.FC<CardGridViewProps> = ({
       case 'In Progress':
         return 'bg-amber-500/20 text-amber-300 border-amber-500/30';
       case 'Wishlist':
-        return 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30';
+        return 'bg-[#EE4540]/20 text-rose-300 border-[#EE4540]/30';
       case 'Dropped':
         return 'bg-rose-500/20 text-rose-300 border-rose-500/30';
       default:
-        return 'bg-slate-800/80 text-slate-400 border-slate-700';
+        return 'bg-[#100612] text-slate-400 border-rose-950';
     }
   };
 
@@ -83,16 +83,17 @@ export const CardGridView: React.FC<CardGridViewProps> = ({
 
   return (
     <div className="space-y-4 animate-fade-in">
-      <div className="p-3 bg-slate-900 border border-slate-800 rounded-2xl flex items-center justify-between gap-3 text-xs">
+      <div className="p-3 border rounded-2xl flex items-center justify-between gap-3 text-xs" style={{ backgroundColor: 'var(--theme-surface)', borderColor: 'var(--theme-border)' }}>
         <span className="text-slate-400 font-medium">
-          Displaying <span className="text-indigo-300 font-bold">{sortedGames.length}</span> games
+          Displaying <span className="theme-accent-text font-bold">{sortedGames.length}</span> games
         </span>
 
         <div className="flex items-center gap-2">
           <select
             value={sortField}
             onChange={(e) => setSortField(e.target.value as SortField)}
-            className="px-3 py-1.5 bg-slate-950 border border-slate-700 rounded-xl text-xs text-indigo-300 font-medium focus:outline-none focus:border-indigo-500 cursor-pointer"
+            className="px-3 py-1.5 border rounded-xl text-xs theme-accent-text font-medium focus:outline-none cursor-pointer"
+            style={{ backgroundColor: 'var(--theme-input)', borderColor: 'var(--theme-border)' }}
             id="cards-sort-field"
           >
             <option value="createdAt">Sort: Date Added</option>
@@ -105,10 +106,11 @@ export const CardGridView: React.FC<CardGridViewProps> = ({
 
           <button
             onClick={() => setSortOrder(prev => (prev === 'asc' ? 'desc' : 'asc'))}
-            className="p-1.5 bg-slate-950 border border-slate-700 rounded-xl text-slate-300 hover:text-white transition-colors cursor-pointer"
+            className="p-1.5 border rounded-xl text-slate-300 hover:text-white transition-colors cursor-pointer"
+            style={{ backgroundColor: 'var(--theme-input)', borderColor: 'var(--theme-border)' }}
             title={`Sort Order: ${sortOrder.toUpperCase()}`}
           >
-            {sortOrder === 'asc' ? <ArrowUp className="w-3.5 h-3.5 text-indigo-400" /> : <ArrowDown className="w-3.5 h-3.5 text-indigo-400" />}
+            {sortOrder === 'asc' ? <ArrowUp className="w-3.5 h-3.5 theme-accent-text" /> : <ArrowDown className="w-3.5 h-3.5 theme-accent-text" />}
           </button>
         </div>
       </div>
@@ -117,10 +119,11 @@ export const CardGridView: React.FC<CardGridViewProps> = ({
         {sortedGames.map(game => (
         <div
           key={game.id}
-          className="bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-2xl overflow-hidden flex flex-col justify-between shadow-xl group transition-all"
+          className="border rounded-2xl overflow-hidden flex flex-col justify-between shadow-xl group transition-all"
+          style={{ backgroundColor: 'var(--theme-surface)', borderColor: 'var(--theme-border)' }}
         >
           {/* Card Top Image Banner */}
-          <div className="relative h-44 w-full bg-slate-950 overflow-hidden">
+          <div className="relative h-44 w-full bg-[#100612] overflow-hidden">
             <img
               src={game.coverUrl || getFallbackCover(game.title)}
               alt={game.title}
@@ -129,13 +132,14 @@ export const CardGridView: React.FC<CardGridViewProps> = ({
               }}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/40 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#160A18] via-[#160A18]/40 to-transparent" />
 
             {/* Favorite & Grade Badges */}
             <div className="absolute top-2.5 right-2.5 flex items-center gap-1.5 z-10">
               <button
                 onClick={() => onUpdateGame(game.id, { favorite: !game.favorite })}
-                className="p-1 rounded-lg bg-slate-950/70 border border-slate-800 text-slate-400 hover:text-amber-400 transition-colors cursor-pointer"
+                className="p-1 rounded-lg border text-slate-400 hover:text-amber-400 transition-colors cursor-pointer"
+                style={{ backgroundColor: 'var(--theme-input)', borderColor: 'var(--theme-border)' }}
               >
                 <Star className={`w-3.5 h-3.5 ${game.favorite ? 'fill-amber-400 text-amber-400' : ''}`} />
               </button>
@@ -146,7 +150,10 @@ export const CardGridView: React.FC<CardGridViewProps> = ({
 
             {/* Genre */}
             <div className="absolute bottom-2 left-3 z-10">
-              <span className="text-[10px] uppercase font-mono font-bold tracking-wider text-indigo-300 bg-slate-950/80 px-2 py-0.5 rounded border border-slate-800">
+              <span
+                className="text-[10px] uppercase font-mono font-bold tracking-wider text-slate-200 px-2 py-0.5 rounded border"
+                style={{ backgroundColor: 'var(--theme-input)', borderColor: 'var(--theme-border)' }}
+              >
                 {game.genre}
               </span>
             </div>
@@ -157,7 +164,7 @@ export const CardGridView: React.FC<CardGridViewProps> = ({
             <div>
               <h3
                 onClick={() => onEditModalOpen(game)}
-                className="font-bold text-slate-100 text-base leading-snug group-hover:text-indigo-300 transition-colors cursor-pointer line-clamp-2"
+                className="font-bold text-slate-100 text-base leading-snug hover:opacity-80 transition-colors cursor-pointer line-clamp-2"
               >
                 {game.title}
               </h3>
@@ -167,11 +174,17 @@ export const CardGridView: React.FC<CardGridViewProps> = ({
                 <span className={`px-2.5 py-0.5 rounded-full border text-xs font-medium ${getStatusBadge(game.status)}`}>
                   {game.status}
                 </span>
-                <span className="px-2 py-0.5 rounded-md bg-slate-950 border border-slate-800 text-[11px] font-mono text-slate-300">
+                <span
+                  className="px-2 py-0.5 rounded-md border text-[11px] font-mono text-slate-300"
+                  style={{ backgroundColor: 'var(--theme-input)', borderColor: 'var(--theme-border)' }}
+                >
                   {game.platform}
                 </span>
                 {game.releaseYear && (
-                  <span className="px-1.5 py-0.5 rounded-md bg-slate-950 border border-slate-800 text-[10px] font-mono text-indigo-300">
+                  <span
+                    className="px-1.5 py-0.5 rounded-md border text-[10px] font-mono text-slate-300"
+                    style={{ backgroundColor: 'var(--theme-input)', borderColor: 'var(--theme-border)' }}
+                  >
                     {game.releaseYear}
                   </span>
                 )}

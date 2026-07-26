@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { GameEntry, CompletionStatus, Grade, PLATFORM_OPTIONS, STATUS_OPTIONS, GRADE_OPTIONS, GENRE_OPTIONS } from '../types';
-import { PlusCircle, Download, Upload, RefreshCw, X, Gamepad2, FileSpreadsheet, Sparkles, Loader2, Calendar, FileText, Image as ImageIcon, Lock, KeyRound } from 'lucide-react';
+import { GameEntry, CompletionStatus, Grade, AppTheme, PLATFORM_OPTIONS, STATUS_OPTIONS, GRADE_OPTIONS, GENRE_OPTIONS } from '../types';
+import { ThemeSelector } from './ThemeSelector';
+import { PlusCircle, Download, Upload, RefreshCw, X, Gamepad2, FileSpreadsheet, Sparkles, Loader2, Calendar, FileText, Image as ImageIcon, Lock, KeyRound, Palette } from 'lucide-react';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -12,6 +13,8 @@ interface SidebarProps {
   totalGamesCount: number;
   onOpenWebSearchModal?: () => void;
   onLockApp?: () => void;
+  currentTheme?: AppTheme;
+  onSelectTheme?: (theme: AppTheme) => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -23,7 +26,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onResetDefaults,
   totalGamesCount,
   onOpenWebSearchModal,
-  onLockApp
+  onLockApp,
+  currentTheme = 'crimson',
+  onSelectTheme
 }) => {
   // Form state
   const [title, setTitle] = useState('');
@@ -167,15 +172,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
       )}
 
       <aside
-        className={`fixed top-0 left-0 bottom-0 z-50 w-80 bg-slate-900 border-r border-slate-800 flex flex-col transition-transform duration-300 ease-in-out ${
+        className={`fixed top-0 left-0 bottom-0 z-50 w-80 max-w-[85vw] border-r flex flex-col transition-transform duration-300 ease-in-out ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
+        style={{ backgroundColor: 'var(--theme-surface)', borderColor: 'var(--theme-border)' }}
         id="sidebar-container"
       >
         {/* Sidebar Header */}
-        <div className="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-950/40">
+        <div className="p-4 border-b flex items-center justify-between" style={{ backgroundColor: 'var(--theme-bg)', borderColor: 'var(--theme-border)' }}>
           <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-lg bg-indigo-600/20 text-indigo-400 border border-indigo-500/30">
+            <div className="p-2 rounded-lg text-white theme-gradient-btn">
               <Gamepad2 className="w-5 h-5" />
             </div>
             <div>
@@ -201,8 +207,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <div className="flex-1 overflow-y-auto p-4 space-y-6 custom-scrollbar">
 
           {/* Section 1: Add Entry Form */}
-          <div className="bg-slate-950/50 p-4 rounded-xl border border-slate-800/80 shadow-sm space-y-3">
-            <div className="flex items-center justify-between text-indigo-400 font-semibold text-xs uppercase tracking-wider">
+          <div className="p-4 rounded-xl border shadow-sm space-y-3" style={{ backgroundColor: 'var(--theme-card)', borderColor: 'var(--theme-border)' }}>
+            <div className="flex items-center justify-between theme-accent-text font-semibold text-xs uppercase tracking-wider">
               <div className="flex items-center gap-2">
                 <PlusCircle className="w-4 h-4" />
                 <span>Add Game</span>
@@ -222,16 +228,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <div>
                 <div className="flex items-center justify-between mb-1">
                   <label className="block text-xs font-medium text-slate-300">
-                    Game Title <span className="text-rose-400">*</span>
+                    Game Title <span className="theme-accent-text">*</span>
                   </label>
                   <button
                     type="button"
                     onClick={handleInlineAutoFetch}
                     disabled={scraping || !title.trim()}
-                    className="text-[11px] text-indigo-400 hover:text-indigo-300 disabled:opacity-40 flex items-center gap-1 cursor-pointer font-medium"
+                    className="text-[11px] theme-accent-text hover:opacity-80 disabled:opacity-40 flex items-center gap-1 cursor-pointer font-medium"
                     id="btn-auto-fetch-info"
                   >
-                    {scraping ? <Loader2 className="w-3 h-3 animate-spin text-indigo-400" /> : <Sparkles className="w-3 h-3 text-indigo-400" />}
+                    {scraping ? <Loader2 className="w-3 h-3 animate-spin theme-accent-text" /> : <Sparkles className="w-3 h-3 theme-accent-text" />}
                     <span>Auto-Fetch Info</span>
                   </button>
                 </div>
@@ -243,16 +249,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     placeholder="Type title (e.g. Elden Ring, Hades)..."
-                    className="w-full px-3 py-1.5 bg-slate-900 border border-slate-700/80 rounded-lg text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                    className="w-full px-3 py-1.5 border rounded-lg text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-[var(--theme-accent)]"
+                    style={{ backgroundColor: 'var(--theme-input)', borderColor: 'var(--theme-border)' }}
                     id="input-game-title"
                   />
                 </div>
 
                 {/* Scraped Results Suggestions Chips */}
                 {scrapedResults.length > 0 && (
-                  <div className="mt-2 p-2 bg-indigo-950/40 border border-indigo-500/30 rounded-lg space-y-1.5 animate-fade-in">
-                    <p className="text-[10px] font-semibold text-indigo-300 uppercase tracking-wider flex items-center gap-1">
-                      <Sparkles className="w-3 h-3 text-indigo-400" /> Select Match to Auto-Fill:
+                  <div className="mt-2 p-2 border rounded-lg space-y-1.5 animate-fade-in" style={{ backgroundColor: 'var(--theme-surface)', borderColor: 'var(--theme-border)' }}>
+                    <p className="text-[10px] font-semibold uppercase tracking-wider flex items-center gap-1 theme-accent-text">
+                      <Sparkles className="w-3 h-3 theme-accent-text" /> Select Match to Auto-Fill:
                     </p>
                     <div className="space-y-1 max-h-28 overflow-y-auto custom-scrollbar">
                       {scrapedResults.map((match, idx) => (
@@ -260,7 +267,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                           key={`match-${match.title}-${idx}`}
                           type="button"
                           onClick={() => applyScrapedMatch(match)}
-                          className="w-full text-left p-1.5 rounded bg-slate-900/80 hover:bg-indigo-900/40 border border-slate-800 text-[11px] text-slate-200 transition-colors flex items-center justify-between cursor-pointer"
+                          className="w-full text-left p-1.5 rounded hover:bg-slate-800 border text-[11px] text-slate-200 transition-colors flex items-center justify-between cursor-pointer"
+                          style={{ backgroundColor: 'var(--theme-input)', borderColor: 'var(--theme-border)' }}
                         >
                           <span className="font-medium truncate max-w-[170px]">{match.title}</span>
                           <span className="text-[10px] text-slate-400 font-mono">({match.releaseYear || 'N/A'})</span>
@@ -276,9 +284,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
               </div>
 
               {/* General Info: Release Year & Synopsis */}
-              <div className="p-2.5 bg-slate-900/80 border border-slate-800 rounded-lg space-y-2">
+              <div className="p-2.5 border rounded-lg space-y-2" style={{ backgroundColor: 'var(--theme-input)', borderColor: 'var(--theme-border)' }}>
                 <div className="text-[11px] font-semibold text-slate-300 flex items-center gap-1">
-                  <FileText className="w-3.5 h-3.5 text-indigo-400" />
+                  <FileText className="w-3.5 h-3.5 theme-accent-text" />
                   <span>General Game Info</span>
                 </div>
 
@@ -291,7 +299,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     value={releaseYear}
                     onChange={(e) => setReleaseYear(e.target.value)}
                     placeholder="e.g. 2024, Oct 2023"
-                    className="w-full px-2.5 py-1 bg-slate-950 border border-slate-700/80 rounded text-xs text-slate-100 placeholder-slate-600 focus:outline-none focus:border-indigo-500"
+                    className="w-full px-2.5 py-1 border rounded text-xs text-slate-100 placeholder-slate-600 focus:outline-none"
+                    style={{ backgroundColor: 'var(--theme-bg)', borderColor: 'var(--theme-border)' }}
                     id="input-release-year"
                   />
                 </div>
@@ -305,7 +314,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     value={synopsis}
                     onChange={(e) => setSynopsis(e.target.value)}
                     placeholder="Brief story / gameplay overview..."
-                    className="w-full px-2.5 py-1 bg-slate-950 border border-slate-700/80 rounded text-xs text-slate-100 placeholder-slate-600 focus:outline-none focus:border-indigo-500 custom-scrollbar resize-none"
+                    className="w-full px-2.5 py-1 border rounded text-xs text-slate-100 placeholder-slate-600 focus:outline-none custom-scrollbar resize-none"
+                    style={{ backgroundColor: 'var(--theme-bg)', borderColor: 'var(--theme-border)' }}
                     id="input-synopsis"
                   />
                 </div>
@@ -315,7 +325,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <div>
                 <div className="flex items-center justify-between mb-1">
                   <label className="text-xs font-medium text-slate-300 flex items-center gap-1">
-                    <ImageIcon className="w-3.5 h-3.5 text-indigo-400" />
+                    <ImageIcon className="w-3.5 h-3.5 theme-accent-text" />
                     <span>Cover Art URL</span>
                   </label>
                 </div>
@@ -324,7 +334,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     <img
                       src={coverUrl}
                       alt="Preview"
-                      className="w-8 h-10 object-cover rounded bg-slate-900 border border-slate-700 shrink-0"
+                      className="w-8 h-10 object-cover rounded border shrink-0"
+                      style={{ backgroundColor: 'var(--theme-bg)', borderColor: 'var(--theme-border)' }}
                       onError={(e) => { (e.target as HTMLElement).style.display = 'none'; }}
                     />
                   )}
@@ -333,7 +344,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     value={coverUrl}
                     onChange={(e) => setCoverUrl(e.target.value)}
                     placeholder="https://... (Poster URL)"
-                    className="flex-1 px-3 py-1.5 bg-slate-900 border border-slate-700/80 rounded-lg text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+                    className="flex-1 px-3 py-1.5 border rounded-lg text-xs text-slate-100 placeholder-slate-500 focus:outline-none"
+                    style={{ backgroundColor: 'var(--theme-input)', borderColor: 'var(--theme-border)' }}
                     id="input-cover-url"
                   />
                 </div>
@@ -347,7 +359,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   <select
                     value={platform}
                     onChange={(e) => setPlatform(e.target.value)}
-                    className="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-700/80 rounded-lg text-xs text-slate-100 focus:outline-none focus:border-indigo-500"
+                    className="w-full px-2.5 py-1.5 border rounded-lg text-xs text-slate-100 focus:outline-none cursor-pointer"
+                    style={{ backgroundColor: 'var(--theme-input)', borderColor: 'var(--theme-border)' }}
                     id="select-platform"
                   >
                     {PLATFORM_OPTIONS.map((p) => (
@@ -365,7 +378,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   <select
                     value={genre}
                     onChange={(e) => setGenre(e.target.value)}
-                    className="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-700/80 rounded-lg text-xs text-slate-100 focus:outline-none focus:border-indigo-500"
+                    className="w-full px-2.5 py-1.5 border rounded-lg text-xs text-slate-100 focus:outline-none cursor-pointer"
+                    style={{ backgroundColor: 'var(--theme-input)', borderColor: 'var(--theme-border)' }}
                     id="select-genre"
                   >
                     {GENRE_OPTIONS.map((g) => (
@@ -387,7 +401,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     value={customPlatform}
                     onChange={(e) => setCustomPlatform(e.target.value)}
                     placeholder="e.g., PS Vita, Arcade"
-                    className="w-full px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs text-slate-100"
+                    className="w-full px-3 py-1.5 border rounded-lg text-xs text-slate-100"
+                    style={{ backgroundColor: 'var(--theme-input)', borderColor: 'var(--theme-border)' }}
                   />
                 </div>
               )}
@@ -400,7 +415,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   <select
                     value={status}
                     onChange={(e) => setStatus(e.target.value as CompletionStatus)}
-                    className="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-700/80 rounded-lg text-xs text-slate-100 focus:outline-none focus:border-indigo-500"
+                    className="w-full px-2.5 py-1.5 border rounded-lg text-xs text-slate-100 focus:outline-none cursor-pointer"
+                    style={{ backgroundColor: 'var(--theme-input)', borderColor: 'var(--theme-border)' }}
                     id="select-status"
                   >
                     {STATUS_OPTIONS.map((s) => (
@@ -418,7 +434,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   <select
                     value={grade}
                     onChange={(e) => setGrade(e.target.value as Grade)}
-                    className="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-700/80 rounded-lg text-xs font-mono font-bold text-slate-100 focus:outline-none focus:border-indigo-500"
+                    className="w-full px-2.5 py-1.5 border rounded-lg text-xs font-mono font-bold text-slate-100 focus:outline-none cursor-pointer"
+                    style={{ backgroundColor: 'var(--theme-input)', borderColor: 'var(--theme-border)' }}
                     id="select-grade"
                   >
                     {GRADE_OPTIONS.map((g) => (
@@ -439,7 +456,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     type="date"
                     value={beatenDate}
                     onChange={(e) => setBeatenDate(e.target.value)}
-                    className="w-full px-2 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs text-slate-100 focus:outline-none focus:border-indigo-500"
+                    className="w-full px-2 py-1.5 border rounded-lg text-xs text-slate-100 focus:outline-none"
+                    style={{ backgroundColor: 'var(--theme-input)', borderColor: 'var(--theme-border)' }}
                     id="input-beaten-date"
                   />
                 </div>
@@ -454,7 +472,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     step="0.5"
                     value={hoursPlayed}
                     onChange={(e) => setHoursPlayed(e.target.value === '' ? '' : parseFloat(e.target.value))}
-                    className="w-full px-2 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs text-slate-100 font-mono focus:outline-none focus:border-indigo-500"
+                    className="w-full px-2 py-1.5 border rounded-lg text-xs text-slate-100 font-mono focus:outline-none"
+                    style={{ backgroundColor: 'var(--theme-input)', borderColor: 'var(--theme-border)' }}
                     id="input-hours-played"
                   />
                 </div>
@@ -466,7 +485,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   id="checkbox-favorite"
                   checked={favorite}
                   onChange={(e) => setFavorite(e.target.checked)}
-                  className="rounded border-slate-700 bg-slate-900 text-indigo-500 focus:ring-indigo-500 w-4 h-4 cursor-pointer"
+                  className="rounded border text-emerald-400 w-4 h-4 cursor-pointer accent-[var(--theme-accent)]"
+                  style={{ borderColor: 'var(--theme-border)' }}
                 />
                 <label htmlFor="checkbox-favorite" className="text-xs text-slate-300 cursor-pointer select-none">
                   Mark as Favorite ★
@@ -475,7 +495,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
               <button
                 type="submit"
-                className="w-full mt-2 py-2 px-4 bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs rounded-lg transition-colors flex items-center justify-center gap-2 shadow-lg shadow-indigo-600/20 cursor-pointer"
+                className="w-full mt-2 py-2 px-4 theme-gradient-btn hover:opacity-90 text-white font-medium text-xs rounded-lg transition-colors flex items-center justify-center gap-2 shadow-lg cursor-pointer"
                 id="submit-add-game-button"
               >
                 <PlusCircle className="w-4 h-4" />
@@ -485,32 +505,33 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </div>
 
           {/* Section 2: Local CSV File Synchronization */}
-          <div className="bg-slate-950/50 p-4 rounded-xl border border-slate-800/80 shadow-sm space-y-3">
-            <div className="flex items-center gap-2 text-cyan-400 font-semibold text-xs uppercase tracking-wider">
+          <div className="p-4 rounded-xl border shadow-sm space-y-3" style={{ backgroundColor: 'var(--theme-card)', borderColor: 'var(--theme-border)' }}>
+            <div className="flex items-center gap-2 theme-accent-text font-semibold text-xs uppercase tracking-wider">
               <FileSpreadsheet className="w-4 h-4" />
               <span>CSV Local File Sync</span>
             </div>
 
             <p className="text-xs text-slate-400 leading-relaxed">
-              Your backlog auto-saves in browser memory. Export or import standard <code className="text-indigo-300 font-mono bg-slate-900 px-1 py-0.5 rounded">.csv</code> files anytime.
+              Your backlog auto-saves in browser memory. Export or import standard <code className="font-mono px-1 py-0.5 rounded border" style={{ backgroundColor: 'var(--theme-bg)', borderColor: 'var(--theme-border)' }}>.csv</code> files anytime.
             </p>
 
             <div className="space-y-2">
               <button
                 onClick={onExportCsv}
-                className="w-full py-2 px-3 bg-slate-800 hover:bg-slate-700 text-slate-100 rounded-lg text-xs font-medium border border-slate-700 flex items-center justify-between transition-colors cursor-pointer"
+                className="w-full py-2 px-3 hover:bg-slate-800 text-slate-100 rounded-lg text-xs font-medium border flex items-center justify-between transition-colors cursor-pointer"
+                style={{ backgroundColor: 'var(--theme-bg)', borderColor: 'var(--theme-border)' }}
                 id="export-csv-button"
               >
                 <span className="flex items-center gap-2">
-                  <Download className="w-4 h-4 text-cyan-400" />
+                  <Download className="w-4 h-4 theme-accent-text" />
                   Export to CSV
                 </span>
                 <span className="text-[10px] font-mono text-slate-400">.csv</span>
               </button>
 
-              <label className="w-full py-2 px-3 bg-slate-800 hover:bg-slate-700 text-slate-100 rounded-lg text-xs font-medium border border-slate-700 flex items-center justify-between transition-colors cursor-pointer">
+              <label className="w-full py-2 px-3 hover:bg-slate-800 text-slate-100 rounded-lg text-xs font-medium border flex items-center justify-between transition-colors cursor-pointer" style={{ backgroundColor: 'var(--theme-bg)', borderColor: 'var(--theme-border)' }}>
                 <span className="flex items-center gap-2">
-                  <Upload className="w-4 h-4 text-indigo-400" />
+                  <Upload className="w-4 h-4 theme-accent-text" />
                   Import CSV File
                 </span>
                 <input
@@ -525,7 +546,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </div>
 
             {/* Reset to defaults button */}
-            <div className="pt-2 border-t border-slate-800">
+            <div className="pt-2 border-t" style={{ borderColor: 'var(--theme-border)' }}>
               {!showResetConfirm ? (
                 <button
                   onClick={() => setShowResetConfirm(true)}
@@ -536,7 +557,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   <span>Restore Sample Dataset</span>
                 </button>
               ) : (
-                <div className="p-2 bg-rose-950/40 border border-rose-800/60 rounded-lg text-center space-y-2">
+                <div className="p-2 border rounded-lg text-center space-y-2" style={{ backgroundColor: 'var(--theme-bg)', borderColor: 'var(--theme-border)' }}>
                   <p className="text-[11px] text-rose-300">
                     Replace current table with sample games?
                   </p>
@@ -553,7 +574,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     </button>
                     <button
                       onClick={() => setShowResetConfirm(false)}
-                      className="flex-1 py-1 bg-slate-800 text-slate-300 text-xs rounded hover:bg-slate-700 cursor-pointer"
+                      className="flex-1 py-1 text-slate-300 text-xs rounded hover:bg-slate-800 cursor-pointer"
+                      style={{ backgroundColor: 'var(--theme-surface)' }}
                     >
                       Cancel
                     </button>
@@ -563,10 +585,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </div>
           </div>
 
-          {/* Section 3: Vault Security */}
+          {/* Section 3: Visual Theme Selection */}
+          {onSelectTheme && (
+            <ThemeSelector
+              currentTheme={currentTheme}
+              onSelectTheme={onSelectTheme}
+              variant="sidebar"
+            />
+          )}
+
+          {/* Section 4: Vault Security */}
           {onLockApp && (
-            <div className="bg-slate-950/50 p-3.5 rounded-xl border border-slate-800/80 shadow-sm space-y-2">
-              <div className="flex items-center justify-between text-indigo-400 font-semibold text-xs uppercase tracking-wider">
+            <div className="p-3.5 rounded-xl border shadow-sm space-y-2" style={{ backgroundColor: 'var(--theme-card)', borderColor: 'var(--theme-border)' }}>
+              <div className="flex items-center justify-between theme-accent-text font-semibold text-xs uppercase tracking-wider">
                 <div className="flex items-center gap-1.5">
                   <Lock className="w-3.5 h-3.5" />
                   <span>Vault Security</span>
@@ -578,10 +609,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
               </p>
               <button
                 onClick={onLockApp}
-                className="w-full py-1.5 px-3 bg-slate-800 hover:bg-slate-700 text-indigo-300 hover:text-indigo-200 rounded-lg text-xs font-medium border border-slate-700/80 flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                className="w-full py-1.5 px-3 hover:bg-slate-800 text-slate-200 hover:text-white rounded-lg text-xs font-medium border flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                style={{ backgroundColor: 'var(--theme-bg)', borderColor: 'var(--theme-border)' }}
                 id="btn-sidebar-lock-now"
               >
-                <Lock className="w-3.5 h-3.5 text-indigo-400" />
+                <Lock className="w-3.5 h-3.5 theme-accent-text" />
                 <span>Lock Vault Now</span>
               </button>
             </div>
