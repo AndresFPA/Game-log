@@ -11,8 +11,8 @@ export const auth = getAuth(app);
 export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId || '(default)');
 
 // Ensure user is authenticated (using anonymous auth so no login screen is forced)
-export const ensureAuth = (): Promise<User> => {
-  return new Promise((resolve, reject) => {
+export const ensureAuth = (): Promise<User | null> => {
+  return new Promise((resolve) => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         unsubscribe();
@@ -23,7 +23,9 @@ export const ensureAuth = (): Promise<User> => {
           unsubscribe();
           resolve(cred.user);
         } catch (err) {
-          reject(err);
+          console.warn('Firebase anonymous auth warning (e.g. domain restriction on host):', err);
+          unsubscribe();
+          resolve(null);
         }
       }
     });
@@ -71,67 +73,94 @@ export const subscribeToGames = (
     gamesList.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
     onData(gamesList);
   }, (err) => {
-    console.error('Firestore games subscription error:', err);
+    console.warn('Firestore games subscription warning:', err);
     if (onError) onError(err);
   });
 };
 
 // Seed default initial games
 export const seedInitialGames = async () => {
-  const batch = writeBatch(db);
-  for (const game of INITIAL_GAMES) {
-    const gameRef = doc(db, 'games', game.id);
-    batch.set(gameRef, game);
+  try {
+    const batch = writeBatch(db);
+    for (const game of INITIAL_GAMES) {
+      const gameRef = doc(db, 'games', game.id);
+      batch.set(gameRef, game);
+    }
+    await batch.commit();
+  } catch (e) {
+    console.warn('Firestore seedInitialGames failed:', e);
   }
-  await batch.commit();
 };
 
 // Add or update a game entry in Firestore
 export const saveGameToFirestore = async (game: GameEntry) => {
-  const gameRef = doc(db, 'games', game.id);
-  await setDoc(gameRef, game, { merge: true });
+  try {
+    const gameRef = doc(db, 'games', game.id);
+    await setDoc(gameRef, game, { merge: true });
+  } catch (e) {
+    console.warn('Firestore saveGameToFirestore failed:', e);
+  }
 };
 
 // Delete a game entry from Firestore
 export const deleteGameFromFirestore = async (gameId: string) => {
-  const gameRef = doc(db, 'games', gameId);
-  await deleteDoc(gameRef);
+  try {
+    const gameRef = doc(db, 'games', gameId);
+    await deleteDoc(gameRef);
+  } catch (e) {
+    console.warn('Firestore deleteGameFromFirestore failed:', e);
+  }
 };
 
 // Reset all games back to default in Firestore
 export const resetGamesInFirestore = async () => {
-  const gamesRef = collection(db, 'games');
-  const snapshot = await getDocs(gamesRef);
-  const batch = writeBatch(db);
-  
-  snapshot.forEach((docSnap) => {
-    batch.delete(docSnap.ref);
-  });
-  
-  for (const game of INITIAL_GAMES) {
-    const gameRef = doc(db, 'games', game.id);
-    batch.set(gameRef, game);
+  try {
+    const gamesRef = collection(db, 'games');
+    const snapshot = await getDocs(gamesRef);
+    const batch = writeBatch(db);
+    
+    snapshot.forEach((docSnap) => {
+      batch.delete(docSnap.ref);
+    });
+    
+    for (const game of INITIAL_GAMES) {
+      const gameRef = doc(db, 'games', game.id);
+      batch.set(gameRef, game);
+    }
+    
+    await batch.commit();
+  } catch (e) {
+    console.warn('Firestore resetGamesInFirestore failed:', e);
   }
-  
-  await batch.commit();
 };
 
 // Subscribe to passcode setting
 export const subscribeToPasscode = (
   onData: (passcode: string) => void
 ) => {
-  const passcodeDocRef = doc(db, 'settings', 'passcode');
-  return onSnapshot(passcodeDocRef, (docSnap) => {
-    if (docSnap.exists() && docSnap.data().passcode) {
-      onData(docSnap.data().passcode);
-    } else {
-      onData('1234');
-    }
-  });
+  try {
+    const passcodeDocRef = doc(db, 'settings', 'passcode');
+    return onSnapshot(passcodeDocRef, (docSnap) => {
+      if (docSnap.exists() && docSnap.data().passcode) {
+        onData(docSnap.data().passcode);
+      } else {
+        onData('1234');
+      }
+    }, (err) => {
+      console.warn('Firestore passcode subscription warning:', err);
+    });
+  } catch (e) {
+    console.warn('Firestore subscribeToPasscode error:', e);
+    return () => {};
+  }
 };
 
 // Save passcode setting to Firestore
 export const savePasscodeToFirestore = async (passcode: string) => {
-  const passcodeDocRef = doc(db, 'settings', 'passcode');
-  await setDoc(passcodeDocRef, { passcode }, { merge: true });
+  try {
+    const passcodeDocRef = doc(db, 'settings', 'passcode');
+    await setDoc(passcodeDocRef, { passcode }, { merge: true });
+  } catch (e) {
+    console.warn('Firestore savePasscodeToFirestore failed:', e);
+  }
 };

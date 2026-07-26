@@ -25,6 +25,17 @@ export interface GameEntry {
   createdAt: string; // ISO date string
 }
 
+export interface ScrapedGameResult {
+  title: string;
+  platform: string;
+  genre: string;
+  releaseYear?: string;
+  summary?: string;
+  coverUrl?: string;
+  suggestedGrade?: string;
+  ratingScore?: number;
+}
+
 export type SortField = 'title' | 'platform' | 'status' | 'grade' | 'beatenDate' | 'hoursPlayed' | 'createdAt';
 export type SortOrder = 'asc' | 'desc';
 

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { GameEntry, CompletionStatus, Grade, PLATFORM_OPTIONS, STATUS_OPTIONS, GRADE_OPTIONS, GENRE_OPTIONS } from '../types';
 import { X, Save, Trash2, Calendar, Clock, Star, Image as ImageIcon, Sparkles, Loader2 } from 'lucide-react';
+import { searchGames } from '../utils/gameSearch';
 
 interface EditGameModalProps {
   game: GameEntry | null;
@@ -50,20 +51,13 @@ export const EditGameModal: React.FC<EditGameModalProps> = ({
     if (!title.trim()) return;
     setScraping(true);
     try {
-      const res = await fetch('/api/search-game', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: title.trim() })
-      });
-      if (res.ok) {
-        const data = await res.json();
-        if (data.games && data.games.length > 0) {
-          const match = data.games[0];
-          if (match.coverUrl) setCoverUrl(match.coverUrl);
-          if (match.genre) setGenre(match.genre);
-          if (match.releaseYear) setReleaseYear(match.releaseYear);
-          if (match.summary) setSynopsis(match.summary);
-        }
+      const games = await searchGames(title.trim());
+      if (games && games.length > 0) {
+        const match = games[0];
+        if (match.coverUrl) setCoverUrl(match.coverUrl);
+        if (match.genre) setGenre(match.genre);
+        if (match.releaseYear) setReleaseYear(match.releaseYear);
+        if (match.summary) setSynopsis(match.summary);
       }
     } catch (err) {
       console.error('Failed to auto scrape cover:', err);

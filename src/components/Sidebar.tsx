@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { GameEntry, CompletionStatus, Grade, AppTheme, PLATFORM_OPTIONS, STATUS_OPTIONS, GRADE_OPTIONS, GENRE_OPTIONS } from '../types';
 import { ThemeSelector } from './ThemeSelector';
 import { PlusCircle, Download, Upload, RefreshCw, X, Gamepad2, FileSpreadsheet, Sparkles, Loader2, Calendar, FileText, Image as ImageIcon, Lock, KeyRound, Palette } from 'lucide-react';
+import { searchGames } from '../utils/gameSearch';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -60,23 +61,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
     setScrapedResults([]);
 
     try {
-      const res = await fetch('/api/search-game', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: title.trim() })
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        if (data.games && data.games.length > 0) {
-          setScrapedResults(data.games);
-          // Auto-fill top match immediately
-          applyScrapedMatch(data.games[0]);
-        } else {
-          setScrapeError('No game info found.');
-        }
+      const games = await searchGames(title.trim());
+      if (games && games.length > 0) {
+        setScrapedResults(games);
+        applyScrapedMatch(games[0]);
       } else {
-        setScrapeError('Failed to fetch game details.');
+        setScrapeError('No game info found.');
       }
     } catch (err) {
       console.error('Error fetching web game data:', err);

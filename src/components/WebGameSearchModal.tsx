@@ -1,17 +1,7 @@
 import React, { useState } from 'react';
-import { GameEntry, CompletionStatus, Grade } from '../types';
+import { GameEntry, CompletionStatus, Grade, ScrapedGameResult } from '../types';
 import { Search, Globe, Sparkles, X, PlusCircle, Check, Loader2, Star } from 'lucide-react';
-
-interface ScrapedGameResult {
-  title: string;
-  platform: string;
-  genre: string;
-  releaseYear?: string;
-  summary?: string;
-  coverUrl?: string;
-  suggestedGrade?: string;
-  ratingScore?: number;
-}
+import { searchGames } from '../utils/gameSearch';
 
 interface WebGameSearchModalProps {
   isOpen: boolean;
@@ -40,22 +30,8 @@ export const WebGameSearchModal: React.FC<WebGameSearchModalProps> = ({
     setErrorMessage(null);
 
     try {
-      const response = await fetch('/api/search-game', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: query.trim() })
-      });
-
-      if (!response.ok) {
-        throw new Error(`Server returned status ${response.status}`);
-      }
-
-      const data = await response.json();
-      if (data.games && Array.isArray(data.games)) {
-        setResults(data.games);
-      } else {
-        setResults([]);
-      }
+      const games = await searchGames(query.trim());
+      setResults(games);
     } catch (err: any) {
       console.error('Error fetching web game data:', err);
       setErrorMessage(err.message || 'Failed to search web data');

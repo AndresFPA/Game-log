@@ -105,7 +105,14 @@ export default function App() {
 
   // Connect Firebase Auth & Firestore real-time subscriptions
   useEffect(() => {
-    // Subscribe to cloud passcode immediately for instant cross-device sync
+    // Load local storage immediately so UI is populated instantly
+    const local = loadGamesFromStorage();
+    if (local && local.length > 0) {
+      setGames(local);
+      setIsCloudLoading(false);
+    }
+
+    // Subscribe to cloud passcode for cross-device sync
     const unsubPasscode = subscribeToPasscode((cloudPasscode) => {
       setSavedPasscode(cloudPasscode);
       localStorage.setItem('master_passcode', cloudPasscode);
@@ -115,12 +122,19 @@ export default function App() {
 
     ensureAuth()
       .then(() => {
-        setIsCloudLoading(true);
-        unsubGames = subscribeToGames((cloudGames) => {
-          setGames(cloudGames);
-          saveGamesToStorage(cloudGames);
-          setIsCloudLoading(false);
-        });
+        unsubGames = subscribeToGames(
+          (cloudGames) => {
+            if (cloudGames && cloudGames.length > 0) {
+              setGames(cloudGames);
+              saveGamesToStorage(cloudGames);
+            }
+            setIsCloudLoading(false);
+          },
+          (err) => {
+            console.warn('Firestore subscription fallback to localStorage:', err);
+            setIsCloudLoading(false);
+          }
+        );
       })
       .catch((err) => {
         console.warn('Firebase Auth/Firestore fallback to localStorage:', err);
@@ -142,16 +156,15 @@ export default function App() {
       id: `game-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
       createdAt: new Date().toISOString()
     };
-    try {
-      await saveGameToFirestore(newEntry);
-      showToast(`Saved "${newEntry.title}" to Cloud!`);
-    } catch (err) {
-      console.error(err);
-      const updated = [newEntry, ...games];
-      setGames(updated);
+
+    setGames(prev => {
+      const updated = [newEntry, ...prev.filter(g => g.id !== newEntry.id)];
       saveGamesToStorage(updated);
-      showToast(`Added "${newEntry.title}" locally.`);
-    }
+      return updated;
+    });
+    showToast(`Added "${newEntry.title}" to catalog!`);
+
+    saveGameToFirestore(newEntry).catch(err => console.warn(err));
   };
 
   // Update game entry
@@ -159,29 +172,28 @@ export default function App() {
     const existing = games.find(g => g.id === id);
     if (!existing) return;
     const updated = { ...existing, ...updatedFields };
-    try {
-      await saveGameToFirestore(updated);
-    } catch (err) {
-      console.error(err);
-      const updatedList = games.map(g => (g.id === id ? updated : g));
-      setGames(updatedList);
+
+    setGames(prev => {
+      const updatedList = prev.map(g => (g.id === id ? updated : g));
       saveGamesToStorage(updatedList);
-    }
+      return updatedList;
+    });
+
+    saveGameToFirestore(updated).catch(err => console.warn(err));
   };
 
   // Delete game entry
   const handleDeleteGame = async (id: string) => {
     const game = games.find(g => g.id === id);
-    try {
-      await deleteGameFromFirestore(id);
-      showToast(`Removed "${game?.title || 'Game'}" from Cloud catalog.`);
-    } catch (err) {
-      console.error(err);
-      const updated = games.filter(g => g.id !== id);
-      setGames(updated);
+
+    setGames(prev => {
+      const updated = prev.filter(g => g.id !== id);
       saveGamesToStorage(updated);
-      showToast(`Removed "${game?.title || 'Game'}" locally.`);
-    }
+      return updated;
+    });
+    showToast(`Removed "${game?.title || 'Game'}" from catalog.`);
+
+    deleteGameFromFirestore(id).catch(err => console.warn(err));
   };
 
   // CSV Export
@@ -194,10 +206,16 @@ export default function App() {
   const handleImportCsv = async (csvText: string) => {
     const parsed = parseCsvStringToGames(csvText);
     if (parsed.length > 0) {
+      setGames(prev => {
+        const combined = [...parsed, ...prev.filter(p => !parsed.some(n => n.id === p.id))];
+        saveGamesToStorage(combined);
+        return combined;
+      });
+      showToast(`Successfully imported ${parsed.length} games to catalog!`);
+
       for (const game of parsed) {
-        await saveGameToFirestore(game).catch(err => console.error(err));
+        saveGameToFirestore(game).catch(err => console.warn(err));
       }
-      showToast(`Successfully imported ${parsed.length} games to Firebase Cloud!`);
     } else {
       showToast('Could not parse CSV file. Please check format.');
     }
@@ -205,16 +223,12 @@ export default function App() {
 
   // Reset defaults
   const handleResetDefaults = async () => {
-    try {
-      await resetGamesInFirestore();
-      showToast('Reset Cloud Firestore database to sample games!');
-    } catch (err) {
-      console.error(err);
-      const defaults = resetGamesToDefault();
-      setGames(defaults);
-      saveGamesToStorage(defaults);
-      showToast('Reset local database.');
-    }
+    const defaults = resetGamesToDefault();
+    setGames(defaults);
+    saveGamesToStorage(defaults);
+    showToast('Reset database to default games!');
+
+    resetGamesInFirestore().catch(err => console.warn(err));
   };
 
   // Handle quick metric filter click
