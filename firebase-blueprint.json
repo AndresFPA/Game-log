@@ -1,0 +1,32 @@
+{
+  "entities": {
+    "Game": {
+      "title": "Game",
+      "description": "Video game entry in the backlog",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "platform": { "type": "string" },
+        "status": { "type": "string" },
+        "grade": { "type": "string" },
+        "beatenDate": { "type": "string" },
+        "hoursPlayed": { "type": "number" },
+        "genre": { "type": "string" },
+        "coverUrl": { "type": "string" },
+        "releaseYear": { "type": "string" },
+        "synopsis": { "type": "string" },
+        "notes": { "type": "string" },
+        "favorite": { "type": "boolean" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "title", "platform", "status", "grade"]
+    },
+    "Setting": {
+      "title": "Setting",
+      "description": "Application preferences and security configuration",
+      "properties": {
+        "passcode": { "type": "string" }
+      }
+    }
+  }
+}
