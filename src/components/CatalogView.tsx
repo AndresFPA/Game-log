@@ -269,14 +269,14 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
           {sortedGames.map((game) => (
             <div
               key={game.id}
-              className="group relative border rounded-2xl overflow-hidden flex flex-col justify-between shadow-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl"
+              onClick={() => onViewModalOpen ? onViewModalOpen(game) : onEditModalOpen(game)}
+              className="group relative border rounded-2xl overflow-hidden flex flex-col justify-between shadow-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl cursor-pointer"
               style={{ backgroundColor: 'var(--theme-surface)', borderColor: 'var(--theme-border)' }}
               id={`catalog-card-${game.id}`}
             >
               {/* Cover Art Box (3:4 Poster Aspect Ratio) */}
               <div 
-                onClick={() => onViewModalOpen ? onViewModalOpen(game) : onEditModalOpen(game)}
-                className="relative aspect-[3/4] w-full overflow-hidden bg-[#100612] cursor-pointer"
+                className="relative aspect-[3/4] w-full overflow-hidden bg-[#100612]"
               >
                 <img
                   src={game.coverUrl || getFallbackCover(game.title)}
@@ -375,7 +375,10 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
                   </span>
 
                   <button
-                    onClick={() => onEditModalOpen(game)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onEditModalOpen(game);
+                    }}
                     className="p-1 rounded text-slate-400 hover:text-slate-100 transition-colors cursor-pointer"
                     title="Edit Entry"
                   >

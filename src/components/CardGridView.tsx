@@ -121,13 +121,13 @@ export const CardGridView: React.FC<CardGridViewProps> = ({
         {sortedGames.map(game => (
         <div
           key={game.id}
-          className="border rounded-2xl overflow-hidden flex flex-col justify-between shadow-xl group transition-all"
+          onClick={() => onViewModalOpen ? onViewModalOpen(game) : onEditModalOpen(game)}
+          className="border rounded-2xl overflow-hidden flex flex-col justify-between shadow-xl group transition-all cursor-pointer hover:border-slate-600"
           style={{ backgroundColor: 'var(--theme-surface)', borderColor: 'var(--theme-border)' }}
         >
           {/* Card Top Image Banner */}
           <div 
-            onClick={() => onViewModalOpen ? onViewModalOpen(game) : onEditModalOpen(game)}
-            className="relative h-44 w-full bg-[#100612] overflow-hidden cursor-pointer"
+            className="relative h-44 w-full bg-[#100612] overflow-hidden"
           >
             <img
               src={game.coverUrl || getFallbackCover(game.title)}
@@ -222,14 +222,20 @@ export const CardGridView: React.FC<CardGridViewProps> = ({
 
               <div className="flex items-center gap-1">
                 <button
-                  onClick={() => onEditModalOpen(game)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onEditModalOpen(game);
+                  }}
                   className="p-1.5 rounded-lg text-slate-400 hover:text-indigo-400 hover:bg-slate-800 transition-colors cursor-pointer"
                   title="Edit Entry"
                 >
                   <Edit3 className="w-3.5 h-3.5" />
                 </button>
                 <button
-                  onClick={() => onDeleteGame(game.id)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onDeleteGame(game.id);
+                  }}
                   className="p-1.5 rounded-lg text-slate-500 hover:text-rose-400 hover:bg-slate-800 transition-colors cursor-pointer"
                   title="Delete Entry"
                 >

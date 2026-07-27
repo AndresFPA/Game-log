@@ -296,12 +296,16 @@ export const EditableTable: React.FC<EditableTableProps> = ({
               {sortedGames.map((game) => (
                 <tr
                   key={game.id}
-                  className="hover:bg-slate-800/40 transition-colors group"
+                  onClick={() => onViewModalOpen ? onViewModalOpen(game) : onEditModalOpen(game)}
+                  className="hover:bg-slate-800/40 transition-colors group cursor-pointer"
                 >
                   {/* Favorite Toggle */}
                   <td className="py-3 px-3 text-center">
                     <button
-                      onClick={() => onUpdateGame(game.id, { favorite: !game.favorite })}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onUpdateGame(game.id, { favorite: !game.favorite });
+                      }}
                       className="text-slate-600 hover:text-amber-400 transition-colors cursor-pointer"
                       title={game.favorite ? 'Unmark Favorite' : 'Mark Favorite'}
                     >
@@ -316,8 +320,7 @@ export const EditableTable: React.FC<EditableTableProps> = ({
                   {/* Cover Thumbnail */}
                   <td className="py-2 px-2 text-center">
                     <div 
-                      onClick={() => onViewModalOpen ? onViewModalOpen(game) : onEditModalOpen(game)}
-                      className="w-10 h-13 mx-auto rounded-lg overflow-hidden bg-slate-950 border border-slate-800 shadow-sm shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
+                      className="w-10 h-13 mx-auto rounded-lg overflow-hidden bg-slate-950 border border-slate-800 shadow-sm shrink-0"
                     >
                       <img
                         src={game.coverUrl || getFallbackCover(game.title)}
@@ -333,10 +336,7 @@ export const EditableTable: React.FC<EditableTableProps> = ({
                   {/* Title & Genre & Synopsis */}
                   <td className="py-3 px-4">
                     <div className="font-semibold text-slate-100 text-sm tracking-tight flex items-center gap-1.5 flex-wrap">
-                      <span
-                        onClick={() => onViewModalOpen ? onViewModalOpen(game) : onEditModalOpen(game)}
-                        className="hover:text-indigo-300 transition-colors cursor-pointer"
-                      >
+                      <span className="hover:text-indigo-300 transition-colors">
                         {game.title}
                       </span>
                       {game.releaseYear && (
@@ -369,7 +369,7 @@ export const EditableTable: React.FC<EditableTableProps> = ({
                   </td>
 
                   {/* Status (Editable Select) */}
-                  <td className="py-3 px-4 whitespace-nowrap">
+                  <td className="py-3 px-4 whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
                     <select
                       value={game.status}
                       onChange={(e) =>
@@ -381,14 +381,14 @@ export const EditableTable: React.FC<EditableTableProps> = ({
                     >
                       {STATUS_OPTIONS.map((s) => (
                         <option key={s} value={s} className="bg-slate-900 text-slate-200">
-                          {s}
+                          {s === 'Completed' ? 'Completed & Mastered' : s}
                         </option>
                       ))}
                     </select>
                   </td>
 
                   {/* Grade (Editable Select) */}
-                  <td className="py-3 px-3 whitespace-nowrap">
+                  <td className="py-3 px-3 whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
                     <select
                       value={game.grade}
                       onChange={(e) =>
@@ -407,7 +407,7 @@ export const EditableTable: React.FC<EditableTableProps> = ({
                   </td>
 
                   {/* Beaten Date (Editable Date picker) */}
-                  <td className="py-3 px-3 whitespace-nowrap">
+                  <td className="py-3 px-3 whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
                     <input
                       type="date"
                       value={game.beatenDate || ''}
@@ -419,7 +419,7 @@ export const EditableTable: React.FC<EditableTableProps> = ({
                   </td>
 
                   {/* Hours Played (Editable Number) */}
-                  <td className="py-3 px-3 text-right whitespace-nowrap font-mono">
+                  <td className="py-3 px-3 text-right whitespace-nowrap font-mono" onClick={(e) => e.stopPropagation()}>
                     <input
                       type="number"
                       min="0"
@@ -435,7 +435,7 @@ export const EditableTable: React.FC<EditableTableProps> = ({
                   </td>
 
                   {/* Actions */}
-                  <td className="py-3 px-3 text-center whitespace-nowrap">
+                  <td className="py-3 px-3 text-center whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
                     <div className="flex items-center justify-center gap-1">
                       <button
                         onClick={() => onEditModalOpen(game)}
