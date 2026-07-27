@@ -29,6 +29,7 @@ import { EditableTable } from './components/EditableTable';
 import { CardGridView } from './components/CardGridView';
 import { StatsView } from './components/StatsView';
 import { EditGameModal } from './components/EditGameModal';
+import { ViewGameModal } from './components/ViewGameModal';
 import { WebGameSearchModal } from './components/WebGameSearchModal';
 import { PasscodeLockModal } from './components/PasscodeLockModal';
 import {
@@ -107,8 +108,9 @@ export default function App() {
   const [selectedGrade, setSelectedGrade] = useState('all');
   const [metricQuickFilter, setMetricQuickFilter] = useState('all');
 
-  // Edit Modal & Web Search Modal State
+  // Edit Modal, View Info Modal & Web Search Modal State
   const [editingGame, setEditingGame] = useState<GameEntry | null>(null);
+  const [viewingGame, setViewingGame] = useState<GameEntry | null>(null);
   const [webSearchOpen, setWebSearchOpen] = useState(false);
 
   // Notification Toast State
@@ -504,6 +506,7 @@ export default function App() {
                 onUpdateGame={handleUpdateGame}
                 onDeleteGame={handleDeleteGame}
                 onEditModalOpen={(game) => setEditingGame(game)}
+                onViewModalOpen={(game) => setViewingGame(game)}
                 onOpenWebSearchModal={() => setWebSearchOpen(true)}
                 searchQuery={searchQuery}
                 onSearchChange={setSearchQuery}
@@ -522,6 +525,7 @@ export default function App() {
                 onUpdateGame={handleUpdateGame}
                 onDeleteGame={handleDeleteGame}
                 onEditModalOpen={(game) => setEditingGame(game)}
+                onViewModalOpen={(game) => setViewingGame(game)}
                 searchQuery={searchQuery}
                 onSearchChange={setSearchQuery}
                 selectedStatus={selectedStatus}
@@ -539,6 +543,7 @@ export default function App() {
                 onUpdateGame={handleUpdateGame}
                 onDeleteGame={handleDeleteGame}
                 onEditModalOpen={(game) => setEditingGame(game)}
+                onViewModalOpen={(game) => setViewingGame(game)}
               />
             )}
 
@@ -549,6 +554,26 @@ export default function App() {
           </div>
         </main>
       </div>
+
+      {/* Read-Only Game Info Overview Modal */}
+      <ViewGameModal
+        game={viewingGame}
+        onClose={() => setViewingGame(null)}
+        onEdit={(game) => {
+          setViewingGame(null);
+          setEditingGame(game);
+        }}
+        onDelete={(id) => {
+          handleDeleteGame(id);
+          setViewingGame(null);
+        }}
+        onUpdateGame={(id, fields) => {
+          handleUpdateGame(id, fields);
+          if (viewingGame && viewingGame.id === id) {
+            setViewingGame({ ...viewingGame, ...fields });
+          }
+        }}
+      />
 
       {/* Edit Game Modal */}
       <EditGameModal

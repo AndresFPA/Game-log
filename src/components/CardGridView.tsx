@@ -7,13 +7,15 @@ interface CardGridViewProps {
   onUpdateGame: (id: string, updatedFields: Partial<GameEntry>) => void;
   onDeleteGame: (id: string) => void;
   onEditModalOpen: (game: GameEntry) => void;
+  onViewModalOpen?: (game: GameEntry) => void;
 }
 
 export const CardGridView: React.FC<CardGridViewProps> = ({
   games,
   onUpdateGame,
   onDeleteGame,
-  onEditModalOpen
+  onEditModalOpen,
+  onViewModalOpen
 }) => {
   const [sortField, setSortField] = useState<SortField>('createdAt');
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
@@ -123,7 +125,10 @@ export const CardGridView: React.FC<CardGridViewProps> = ({
           style={{ backgroundColor: 'var(--theme-surface)', borderColor: 'var(--theme-border)' }}
         >
           {/* Card Top Image Banner */}
-          <div className="relative h-44 w-full bg-[#100612] overflow-hidden">
+          <div 
+            onClick={() => onViewModalOpen ? onViewModalOpen(game) : onEditModalOpen(game)}
+            className="relative h-44 w-full bg-[#100612] overflow-hidden cursor-pointer"
+          >
             <img
               src={game.coverUrl || getFallbackCover(game.title)}
               alt={game.title}
@@ -137,7 +142,10 @@ export const CardGridView: React.FC<CardGridViewProps> = ({
             {/* Favorite & Grade Badges */}
             <div className="absolute top-2.5 right-2.5 flex items-center gap-1.5 z-10">
               <button
-                onClick={() => onUpdateGame(game.id, { favorite: !game.favorite })}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onUpdateGame(game.id, { favorite: !game.favorite });
+                }}
                 className="p-1 rounded-lg border text-slate-400 hover:text-amber-400 transition-colors cursor-pointer"
                 style={{ backgroundColor: 'var(--theme-input)', borderColor: 'var(--theme-border)' }}
               >
@@ -163,7 +171,7 @@ export const CardGridView: React.FC<CardGridViewProps> = ({
           <div className="p-4 flex-1 flex flex-col justify-between space-y-3">
             <div>
               <h3
-                onClick={() => onEditModalOpen(game)}
+                onClick={() => onViewModalOpen ? onViewModalOpen(game) : onEditModalOpen(game)}
                 className="font-bold text-slate-100 text-base leading-snug hover:opacity-80 transition-colors cursor-pointer line-clamp-2"
               >
                 {game.title}

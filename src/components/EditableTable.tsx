@@ -7,6 +7,7 @@ interface EditableTableProps {
   onUpdateGame: (id: string, updatedFields: Partial<GameEntry>) => void;
   onDeleteGame: (id: string) => void;
   onEditModalOpen: (game: GameEntry) => void;
+  onViewModalOpen?: (game: GameEntry) => void;
   searchQuery: string;
   onSearchChange: (q: string) => void;
   selectedStatus: string;
@@ -22,6 +23,7 @@ export const EditableTable: React.FC<EditableTableProps> = ({
   onUpdateGame,
   onDeleteGame,
   onEditModalOpen,
+  onViewModalOpen,
   searchQuery,
   onSearchChange,
   selectedStatus,
@@ -313,7 +315,10 @@ export const EditableTable: React.FC<EditableTableProps> = ({
 
                   {/* Cover Thumbnail */}
                   <td className="py-2 px-2 text-center">
-                    <div className="w-10 h-13 mx-auto rounded-lg overflow-hidden bg-slate-950 border border-slate-800 shadow-sm shrink-0">
+                    <div 
+                      onClick={() => onViewModalOpen ? onViewModalOpen(game) : onEditModalOpen(game)}
+                      className="w-10 h-13 mx-auto rounded-lg overflow-hidden bg-slate-950 border border-slate-800 shadow-sm shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
+                    >
                       <img
                         src={game.coverUrl || getFallbackCover(game.title)}
                         alt={game.title}
@@ -329,7 +334,7 @@ export const EditableTable: React.FC<EditableTableProps> = ({
                   <td className="py-3 px-4">
                     <div className="font-semibold text-slate-100 text-sm tracking-tight flex items-center gap-1.5 flex-wrap">
                       <span
-                        onClick={() => onEditModalOpen(game)}
+                        onClick={() => onViewModalOpen ? onViewModalOpen(game) : onEditModalOpen(game)}
                         className="hover:text-indigo-300 transition-colors cursor-pointer"
                       >
                         {game.title}

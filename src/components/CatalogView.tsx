@@ -20,6 +20,7 @@ interface CatalogViewProps {
   onUpdateGame: (id: string, updatedFields: Partial<GameEntry>) => void;
   onDeleteGame: (id: string) => void;
   onEditModalOpen: (game: GameEntry) => void;
+  onViewModalOpen?: (game: GameEntry) => void;
   onOpenWebSearchModal?: () => void;
   searchQuery: string;
   onSearchChange: (q: string) => void;
@@ -36,6 +37,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
   onUpdateGame,
   onDeleteGame,
   onEditModalOpen,
+  onViewModalOpen,
   onOpenWebSearchModal,
   searchQuery,
   onSearchChange,
@@ -272,7 +274,10 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
               id={`catalog-card-${game.id}`}
             >
               {/* Cover Art Box (3:4 Poster Aspect Ratio) */}
-              <div className="relative aspect-[3/4] w-full overflow-hidden bg-[#100612]">
+              <div 
+                onClick={() => onViewModalOpen ? onViewModalOpen(game) : onEditModalOpen(game)}
+                className="relative aspect-[3/4] w-full overflow-hidden bg-[#100612] cursor-pointer"
+              >
                 <img
                   src={game.coverUrl || getFallbackCover(game.title)}
                   alt={game.title}
@@ -338,8 +343,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
                     )}
                   </div>
                   <h3
-                    onClick={() => onEditModalOpen(game)}
-                    className="font-bold text-slate-100 text-xs sm:text-sm leading-tight line-clamp-2 hover:opacity-80 transition-colors cursor-pointer"
+                    className="font-bold text-slate-100 text-xs sm:text-sm leading-tight line-clamp-2 hover:opacity-80 transition-colors"
                     title={game.title}
                   >
                     {game.title}
