@@ -16,6 +16,8 @@ interface EditableTableProps {
   onPlatformChange: (p: string) => void;
   selectedGrade: string;
   onGradeChange: (g: string) => void;
+  showFavoritesOnly?: boolean;
+  onFavoritesOnlyToggle?: () => void;
 }
 
 export const EditableTable: React.FC<EditableTableProps> = ({
@@ -31,7 +33,9 @@ export const EditableTable: React.FC<EditableTableProps> = ({
   selectedPlatform,
   onPlatformChange,
   selectedGrade,
-  onGradeChange
+  onGradeChange,
+  showFavoritesOnly = false,
+  onFavoritesOnlyToggle
 }) => {
   const [sortField, setSortField] = useState<SortField>('createdAt');
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
@@ -165,9 +169,30 @@ export const EditableTable: React.FC<EditableTableProps> = ({
           >
             <option value="all">All Statuses</option>
             {STATUS_OPTIONS.map(s => (
-              <option key={s} value={s}>{s === 'Completed' ? 'Completed & Mastered' : s}</option>
+              <option key={s} value={s}>{s}</option>
             ))}
           </select>
+
+          {/* Favorites Toggle Button */}
+          {onFavoritesOnlyToggle && (
+            <button
+              onClick={onFavoritesOnlyToggle}
+              className={`px-3 py-1.5 border rounded-xl text-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer ${
+                showFavoritesOnly
+                  ? 'bg-amber-500/20 text-amber-300 border-amber-500/50 shadow-sm'
+                  : 'text-slate-300 hover:text-slate-100'
+              }`}
+              style={{
+                backgroundColor: showFavoritesOnly ? undefined : 'var(--theme-input)',
+                borderColor: showFavoritesOnly ? undefined : 'var(--theme-border)'
+              }}
+              title="Toggle Favorites Only"
+              id="table-filter-favorites"
+            >
+              <Star className={`w-3.5 h-3.5 ${showFavoritesOnly ? 'fill-amber-400 text-amber-400' : 'text-slate-400'}`} />
+              <span>Favorites</span>
+            </button>
+          )}
 
           {/* Grade Select */}
           <select
@@ -381,7 +406,7 @@ export const EditableTable: React.FC<EditableTableProps> = ({
                     >
                       {STATUS_OPTIONS.map((s) => (
                         <option key={s} value={s} className="bg-slate-900 text-slate-200">
-                          {s === 'Completed' ? 'Completed & Mastered' : s}
+                          {s}
                         </option>
                       ))}
                     </select>

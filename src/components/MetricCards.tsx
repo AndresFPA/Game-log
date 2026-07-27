@@ -14,6 +14,7 @@ export const MetricCards: React.FC<MetricCardsProps> = ({ games, selectedFilter,
   const inProgress = games.filter(g => g.status === 'In Progress').length;
   const backlog = games.filter(g => g.status === 'Not Started').length;
   const wishlist = games.filter(g => g.status === 'Wishlist').length;
+  const favoritesCount = games.filter(g => g.favorite).length;
   const sTierCount = games.filter(g => g.grade === 'S').length;
   
   const completionRate = total > 0 ? Math.round((completed / total) * 100) : 0;
@@ -63,6 +64,15 @@ export const MetricCards: React.FC<MetricCardsProps> = ({ games, selectedFilter,
       activeColor: 'ring-2 ring-amber-500'
     },
     {
+      id: 'favorites',
+      title: 'Favorites',
+      value: favoritesCount,
+      subtext: 'Starred Favorites',
+      icon: Star,
+      color: 'bg-amber-400/15 text-amber-300 border-amber-400/30',
+      activeColor: 'ring-2 ring-amber-400'
+    },
+    {
       id: 'grade_S',
       title: 'S-Tier Masterpieces',
       value: sTierCount,
@@ -83,7 +93,7 @@ export const MetricCards: React.FC<MetricCardsProps> = ({ games, selectedFilter,
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 mb-6">
+    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
       {metrics.map(metric => {
         const Icon = metric.icon;
         const isSelected = selectedFilter === metric.id;

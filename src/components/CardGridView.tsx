@@ -8,6 +8,8 @@ interface CardGridViewProps {
   onDeleteGame: (id: string) => void;
   onEditModalOpen: (game: GameEntry) => void;
   onViewModalOpen?: (game: GameEntry) => void;
+  showFavoritesOnly?: boolean;
+  onFavoritesOnlyToggle?: () => void;
 }
 
 export const CardGridView: React.FC<CardGridViewProps> = ({
@@ -15,7 +17,9 @@ export const CardGridView: React.FC<CardGridViewProps> = ({
   onUpdateGame,
   onDeleteGame,
   onEditModalOpen,
-  onViewModalOpen
+  onViewModalOpen,
+  showFavoritesOnly = false,
+  onFavoritesOnlyToggle
 }) => {
   const [sortField, setSortField] = useState<SortField>('createdAt');
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
@@ -91,6 +95,26 @@ export const CardGridView: React.FC<CardGridViewProps> = ({
         </span>
 
         <div className="flex items-center gap-2">
+          {onFavoritesOnlyToggle && (
+            <button
+              onClick={onFavoritesOnlyToggle}
+              className={`px-3 py-1.5 border rounded-xl text-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer ${
+                showFavoritesOnly
+                  ? 'bg-amber-500/20 text-amber-300 border-amber-500/50 shadow-sm'
+                  : 'text-slate-300 hover:text-slate-100'
+              }`}
+              style={{
+                backgroundColor: showFavoritesOnly ? undefined : 'var(--theme-input)',
+                borderColor: showFavoritesOnly ? undefined : 'var(--theme-border)'
+              }}
+              title="Toggle Favorites Only"
+              id="cards-filter-favorites"
+            >
+              <Star className={`w-3.5 h-3.5 ${showFavoritesOnly ? 'fill-amber-400 text-amber-400' : 'text-slate-400'}`} />
+              <span>Favorites</span>
+            </button>
+          )}
+
           <select
             value={sortField}
             onChange={(e) => setSortField(e.target.value as SortField)}

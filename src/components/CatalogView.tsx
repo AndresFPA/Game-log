@@ -30,6 +30,8 @@ interface CatalogViewProps {
   onPlatformChange: (p: string) => void;
   selectedGrade: string;
   onGradeChange: (g: string) => void;
+  showFavoritesOnly?: boolean;
+  onFavoritesOnlyToggle?: () => void;
 }
 
 export const CatalogView: React.FC<CatalogViewProps> = ({
@@ -46,7 +48,9 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
   selectedPlatform,
   onPlatformChange,
   selectedGrade,
-  onGradeChange
+  onGradeChange,
+  showFavoritesOnly = false,
+  onFavoritesOnlyToggle
 }) => {
   const [sortField, setSortField] = useState<SortField>('createdAt');
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
@@ -159,10 +163,31 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
             <option value="all">All Statuses</option>
             {STATUS_OPTIONS.map((s) => (
               <option key={s} value={s}>
-                {s === 'Completed' ? 'Completed & Mastered' : s}
+                {s}
               </option>
             ))}
           </select>
+
+          {/* Favorites Filter Button */}
+          {onFavoritesOnlyToggle && (
+            <button
+              onClick={onFavoritesOnlyToggle}
+              className={`px-3 py-1.5 border rounded-xl text-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer ${
+                showFavoritesOnly
+                  ? 'bg-amber-500/20 text-amber-300 border-amber-500/50 shadow-sm'
+                  : 'text-slate-300 hover:text-slate-100'
+              }`}
+              style={{
+                backgroundColor: showFavoritesOnly ? undefined : 'var(--theme-input)',
+                borderColor: showFavoritesOnly ? undefined : 'var(--theme-border)'
+              }}
+              title="Toggle Favorites Only"
+              id="catalog-filter-favorites"
+            >
+              <Star className={`w-3.5 h-3.5 ${showFavoritesOnly ? 'fill-amber-400 text-amber-400' : 'text-slate-400'}`} />
+              <span>Favorites</span>
+            </button>
+          )}
 
           {/* Grade Filter */}
           <select

@@ -106,6 +106,7 @@ export default function App() {
   const [selectedStatus, setSelectedStatus] = useState('all');
   const [selectedPlatform, setSelectedPlatform] = useState('all');
   const [selectedGrade, setSelectedGrade] = useState('all');
+  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const [metricQuickFilter, setMetricQuickFilter] = useState('all');
 
   // Edit Modal, View Info Modal & Web Search Modal State
@@ -257,17 +258,29 @@ export default function App() {
     if (filterId === 'all') {
       setSelectedStatus('all');
       setSelectedGrade('all');
+      setShowFavoritesOnly(false);
+    } else if (filterId === 'favorites') {
+      setShowFavoritesOnly(true);
+      setSelectedStatus('all');
+      setSelectedGrade('all');
     } else if (filterId === 'grade_S') {
       setSelectedGrade('S');
       setSelectedStatus('all');
+      setShowFavoritesOnly(false);
     } else {
       setSelectedStatus(filterId);
       setSelectedGrade('all');
+      setShowFavoritesOnly(false);
     }
   };
 
   // Filtered games calculation
   const filteredGames = games.filter(g => {
+    // Favorites filter
+    if (showFavoritesOnly && !g.favorite) {
+      return false;
+    }
+
     // Search query
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
@@ -516,6 +529,8 @@ export default function App() {
                 onPlatformChange={setSelectedPlatform}
                 selectedGrade={selectedGrade}
                 onGradeChange={setSelectedGrade}
+                showFavoritesOnly={showFavoritesOnly}
+                onFavoritesOnlyToggle={() => setShowFavoritesOnly(prev => !prev)}
               />
             )}
 
@@ -534,6 +549,8 @@ export default function App() {
                 onPlatformChange={setSelectedPlatform}
                 selectedGrade={selectedGrade}
                 onGradeChange={setSelectedGrade}
+                showFavoritesOnly={showFavoritesOnly}
+                onFavoritesOnlyToggle={() => setShowFavoritesOnly(prev => !prev)}
               />
             )}
 
@@ -544,6 +561,8 @@ export default function App() {
                 onDeleteGame={handleDeleteGame}
                 onEditModalOpen={(game) => setEditingGame(game)}
                 onViewModalOpen={(game) => setViewingGame(game)}
+                showFavoritesOnly={showFavoritesOnly}
+                onFavoritesOnlyToggle={() => setShowFavoritesOnly(prev => !prev)}
               />
             )}
 
