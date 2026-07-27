@@ -122,7 +122,7 @@ export const PasscodeLockModal: React.FC<PasscodeLockModalProps> = ({
 
           <div className="mt-3 inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-[11px] font-mono text-slate-300" style={{ backgroundColor: 'var(--theme-input)', borderColor: 'var(--theme-border)' }}>
             <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-            <span>Security: Cloud Sync Active</span>
+            <span>Security: PIN required once every 24hrs</span>
           </div>
         </div>
 

@@ -212,6 +212,64 @@ async function generateSmartFallbackGames(query: string) {
   ];
 }
 
+async function searchWikipediaDatabase(query: string) {
+  const cleanTitle = query.trim();
+  try {
+    const searchUrl = `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(cleanTitle + ' video game')}&utf8=&format=json`;
+    const searchRes = await fetch(searchUrl, { headers: { 'User-Agent': 'GameBacklogVault/1.0' } });
+    if (!searchRes.ok) return [];
+
+    const searchData = await searchRes.json();
+    const items = searchData?.query?.search;
+    if (!items || !Array.isArray(items) || items.length === 0) return [];
+
+    const topItem = items[0];
+    if (!topItem || !topItem.title) return [];
+
+    const summaryUrl = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(topItem.title)}`;
+    const summaryRes = await fetch(summaryUrl, { headers: { 'User-Agent': 'GameBacklogVault/1.0' } });
+    if (!summaryRes.ok) return [];
+
+    const summaryData = await summaryRes.json();
+    if (!summaryData || summaryData.type === 'https://mediawiki.org/wiki/HyperSwitch/errors/not_found') return [];
+
+    const title = (summaryData.title || topItem.title).replace(/\s*\([^)]*video game[^)]*\)/i, '').trim();
+    const description = summaryData.extract || summaryData.description || '';
+    const image = summaryData.originalimage?.source || summaryData.thumbnail?.source;
+
+    if (!title || (!description && !image)) return [];
+
+    const yearMatch = description.match(/\b(19\d\d|20\d\d)\b/);
+    const releaseYear = yearMatch ? yearMatch[0] : '2024';
+
+    let genre = 'Action / Adventure';
+    const descLower = description.toLowerCase();
+    if (descLower.includes('role-playing') || descLower.includes('rpg')) genre = 'RPG';
+    else if (descLower.includes('first-person shooter') || descLower.includes('fps')) genre = 'FPS / Shooter';
+    else if (descLower.includes('platform')) genre = 'Platformer';
+    else if (descLower.includes('roguelike') || descLower.includes('roguelite')) genre = 'Roguelike';
+    else if (descLower.includes('horror')) genre = 'Horror';
+    else if (descLower.includes('sports')) genre = 'Sports';
+
+    const steamCover = await getSteamCoverUrl(title);
+    const coverUrl = image || steamCover || getFallbackCover(title, genre);
+
+    return [{
+      title,
+      platform: 'Multi-Platform',
+      genre,
+      releaseYear,
+      summary: description,
+      coverUrl,
+      suggestedGrade: 'S',
+      ratingScore: 92
+    }];
+  } catch (err) {
+    console.warn('Error searching Wikipedia database:', err);
+    return [];
+  }
+}
+
 export default async function handler(req: any, res: any) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method Not Allowed' });
@@ -225,7 +283,13 @@ export default async function handler(req: any, res: any) {
 
     const cleanTitle = query.trim();
 
-    // 1. Steam DB
+    // 1. Wikipedia DB First
+    const wikiGames = await searchWikipediaDatabase(cleanTitle);
+    if (wikiGames && wikiGames.length > 0) {
+      return res.json({ games: wikiGames });
+    }
+
+    // 2. Steam DB
     const steamGames = await searchSteamDatabase(cleanTitle);
     if (steamGames && steamGames.length > 0) {
       return res.json({ games: steamGames });

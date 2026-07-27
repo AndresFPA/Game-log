@@ -163,7 +163,7 @@ export const EditableTable: React.FC<EditableTableProps> = ({
           >
             <option value="all">All Statuses</option>
             {STATUS_OPTIONS.map(s => (
-              <option key={s} value={s}>{s}</option>
+              <option key={s} value={s}>{s === 'Completed' ? 'Completed & Mastered' : s}</option>
             ))}
           </select>
 

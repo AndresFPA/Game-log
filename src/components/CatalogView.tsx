@@ -157,7 +157,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
             <option value="all">All Statuses</option>
             {STATUS_OPTIONS.map((s) => (
               <option key={s} value={s}>
-                {s}
+                {s === 'Completed' ? 'Completed & Mastered' : s}
               </option>
             ))}
           </select>

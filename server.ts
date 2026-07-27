@@ -287,7 +287,65 @@ async function generateSmartFallbackGames(query: string) {
   ];
 }
 
-// API Route: Web Scrape & Search Game Metadata (Steam DB First + Web Fallback)
+async function searchWikipediaDatabase(query: string) {
+  const cleanTitle = query.trim();
+  try {
+    const searchUrl = `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(cleanTitle + ' video game')}&utf8=&format=json`;
+    const searchRes = await fetch(searchUrl, { headers: { 'User-Agent': 'GameBacklogVault/1.0' } });
+    if (!searchRes.ok) return [];
+
+    const searchData = await searchRes.json();
+    const items = searchData?.query?.search;
+    if (!items || !Array.isArray(items) || items.length === 0) return [];
+
+    const topItem = items[0];
+    if (!topItem || !topItem.title) return [];
+
+    const summaryUrl = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(topItem.title)}`;
+    const summaryRes = await fetch(summaryUrl, { headers: { 'User-Agent': 'GameBacklogVault/1.0' } });
+    if (!summaryRes.ok) return [];
+
+    const summaryData = await summaryRes.json();
+    if (!summaryData || summaryData.type === 'https://mediawiki.org/wiki/HyperSwitch/errors/not_found') return [];
+
+    const title = (summaryData.title || topItem.title).replace(/\s*\([^)]*video game[^)]*\)/i, '').trim();
+    const description = summaryData.extract || summaryData.description || '';
+    const image = summaryData.originalimage?.source || summaryData.thumbnail?.source;
+
+    if (!title || (!description && !image)) return [];
+
+    const yearMatch = description.match(/\b(19\d\d|20\d\d)\b/);
+    const releaseYear = yearMatch ? yearMatch[0] : '2024';
+
+    let genre = 'Action / Adventure';
+    const descLower = description.toLowerCase();
+    if (descLower.includes('role-playing') || descLower.includes('rpg')) genre = 'RPG';
+    else if (descLower.includes('first-person shooter') || descLower.includes('fps')) genre = 'FPS / Shooter';
+    else if (descLower.includes('platform')) genre = 'Platformer';
+    else if (descLower.includes('roguelike') || descLower.includes('roguelite')) genre = 'Roguelike';
+    else if (descLower.includes('horror')) genre = 'Horror';
+    else if (descLower.includes('sports')) genre = 'Sports';
+
+    const steamCover = await getSteamCoverUrl(title);
+    const coverUrl = image || steamCover || getFallbackCover(title, genre);
+
+    return [{
+      title,
+      platform: 'Multi-Platform',
+      genre,
+      releaseYear,
+      summary: description,
+      coverUrl,
+      suggestedGrade: 'S',
+      ratingScore: 92
+    }];
+  } catch (err) {
+    console.warn('Error searching Wikipedia database:', err);
+    return [];
+  }
+}
+
+// API Route: Web Scrape & Search Game Metadata (Wikipedia First -> Steam DB -> Web/Gemini Fallback)
 app.post("/api/search-game", async (req, res) => {
   try {
     const { query } = req.body;
@@ -297,7 +355,16 @@ app.post("/api/search-game", async (req, res) => {
 
     const cleanTitle = query.trim();
 
-    // STEP 1: Search Steam's database directly
+    // STEP 1: Search Wikipedia first
+    console.log(`Searching Wikipedia for "${cleanTitle}"...`);
+    const wikiGames = await searchWikipediaDatabase(cleanTitle);
+
+    if (wikiGames && wikiGames.length > 0) {
+      console.log(`Found game on Wikipedia for "${cleanTitle}".`);
+      return res.json({ games: wikiGames });
+    }
+
+    // STEP 2: Search Steam's database
     console.log(`Searching Steam Database for "${cleanTitle}"...`);
     const steamGames = await searchSteamDatabase(cleanTitle);
 

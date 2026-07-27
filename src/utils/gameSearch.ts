@@ -32,10 +32,72 @@ export function getFallbackCover(title: string, genre?: string): string {
   return `https://images.unsplash.com/photo-1612287230202-1ff1d85d1bdf?q=80&w=800&auto=format&fit=crop`;
 }
 
+export async function searchWikipediaGame(query: string): Promise<ScrapedGameResult | null> {
+  const cleanTitle = query.trim();
+  if (!cleanTitle) return null;
+
+  try {
+    const searchUrl = `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(cleanTitle + ' video game')}&utf8=&format=json&origin=*`;
+    const searchRes = await fetch(searchUrl);
+    if (!searchRes.ok) return null;
+
+    const searchData = await searchRes.json();
+    const items = searchData?.query?.search;
+    if (!items || !Array.isArray(items) || items.length === 0) return null;
+
+    const topItem = items[0];
+    if (!topItem || !topItem.title) return null;
+
+    const summaryUrl = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(topItem.title)}`;
+    const summaryRes = await fetch(summaryUrl);
+    if (!summaryRes.ok) return null;
+
+    const summaryData = await summaryRes.json();
+    if (!summaryData || summaryData.type === 'https://mediawiki.org/wiki/HyperSwitch/errors/not_found') {
+      return null;
+    }
+
+    const title = (summaryData.title || topItem.title).replace(/\s*\([^)]*video game[^)]*\)/i, '').trim();
+    const description = summaryData.extract || summaryData.description || '';
+    const image = summaryData.originalimage?.source || summaryData.thumbnail?.source;
+
+    if (!title || (!description && !image)) return null;
+
+    const yearMatch = description.match(/\b(19\d\d|20\d\d)\b/);
+    const releaseYear = yearMatch ? yearMatch[0] : '2024';
+
+    let genre = 'Action / Adventure';
+    const descLower = description.toLowerCase();
+    if (descLower.includes('role-playing') || descLower.includes('rpg')) genre = 'RPG';
+    else if (descLower.includes('first-person shooter') || descLower.includes('fps')) genre = 'FPS / Shooter';
+    else if (descLower.includes('platform')) genre = 'Platformer';
+    else if (descLower.includes('roguelike') || descLower.includes('roguelite')) genre = 'Roguelike';
+    else if (descLower.includes('horror')) genre = 'Horror';
+    else if (descLower.includes('sports')) genre = 'Sports';
+
+    return {
+      title,
+      platform: 'Multi-Platform',
+      genre,
+      releaseYear,
+      summary: description,
+      coverUrl: image || getFallbackCover(title, genre),
+      suggestedGrade: 'S',
+      ratingScore: 92
+    };
+  } catch (err) {
+    console.warn('Wikipedia game lookup error:', err);
+    return null;
+  }
+}
+
 /**
  * Universal client-side game search function.
  * Attempts server endpoint /api/search-game first.
- * If server is unavailable or fails (e.g. static hosting on Vercel), executes direct client fallback!
+ * If server is unavailable or fails (e.g. static hosting on Vercel), executes direct client fallbacks:
+ * 1. Wikipedia Search First
+ * 2. Steam Store API
+ * 3. Smart Fallbacks
  */
 export async function searchGames(query: string): Promise<ScrapedGameResult[]> {
   const cleanTitle = query.trim();
@@ -59,7 +121,13 @@ export async function searchGames(query: string): Promise<ScrapedGameResult[]> {
     console.warn('API /api/search-game unavailable, running client fallback:', err);
   }
 
-  // Attempt 2: Direct Client Steam Store API query
+  // Attempt 2: Direct Wikipedia API query
+  const wikiResult = await searchWikipediaGame(cleanTitle);
+  if (wikiResult) {
+    return [wikiResult];
+  }
+
+  // Attempt 3: Direct Client Steam Store API query
   try {
     const steamRes = await fetch(`https://store.steampowered.com/api/storesearch/?term=${encodeURIComponent(cleanTitle)}&l=english&cc=US`);
     if (steamRes.ok) {
@@ -92,7 +160,7 @@ export async function searchGames(query: string): Promise<ScrapedGameResult[]> {
     console.warn('Direct Steam API search skipped/blocked:', e);
   }
 
-  // Attempt 3: Smart Client Fallback Generator
+  // Attempt 4: Smart Client Fallback Generator
   const lower = cleanTitle.toLowerCase();
   let platform = "PC / Steam";
   let genre = "Action RPG";

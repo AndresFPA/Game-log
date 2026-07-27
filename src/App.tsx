@@ -61,8 +61,19 @@ export default function App() {
     localStorage.setItem('game_log_theme', theme);
   }, [theme]);
   
-  // Security & Passcode State (Starts locked every time app opens or reloads)
-  const [isUnlocked, setIsUnlocked] = useState<boolean>(false);
+  // Security & Passcode State (Unlocked PIN valid for 24 hours)
+  const [isUnlocked, setIsUnlocked] = useState<boolean>(() => {
+    const lastUnlocked = localStorage.getItem('vault_unlocked_at');
+    if (lastUnlocked) {
+      const elapsed = Date.now() - parseInt(lastUnlocked, 10);
+      const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000;
+      if (!isNaN(elapsed) && elapsed < TWENTY_FOUR_HOURS) {
+        return true;
+      }
+    }
+    return false;
+  });
+
   const [savedPasscode, setSavedPasscode] = useState<string>(() => {
     return localStorage.getItem('master_passcode') || '1234';
   });
@@ -74,7 +85,14 @@ export default function App() {
     showToast('Updated Master Passcode across devices!');
   };
 
+  const handleUnlockApp = () => {
+    localStorage.setItem('vault_unlocked_at', Date.now().toString());
+    setIsUnlocked(true);
+    showToast('Vault unlocked. PIN session active for 24 hours.');
+  };
+
   const handleLockApp = () => {
+    localStorage.removeItem('vault_unlocked_at');
     setIsUnlocked(false);
     showToast('Vault locked.');
   };
@@ -257,9 +275,15 @@ export default function App() {
       if (!matchTitle && !matchGenre && !matchPlatform) return false;
     }
 
-    // Status filter
-    if (selectedStatus !== 'all' && g.status !== selectedStatus) {
-      return false;
+    // Status filter (Completed filter also shows Mastered games)
+    if (selectedStatus !== 'all') {
+      if (selectedStatus === 'Completed') {
+        if (g.status !== 'Completed' && g.status !== 'Mastered') {
+          return false;
+        }
+      } else if (g.status !== selectedStatus) {
+        return false;
+      }
     }
 
     // Platform filter
@@ -550,13 +574,10 @@ export default function App() {
         }}
       />
 
-      {/* Master Passcode Vault Lock Screen (Prompts every time app opens / reloads) */}
+      {/* Master Passcode Vault Lock Screen (Requires unlock once every 24hrs) */}
       {!isUnlocked && (
         <PasscodeLockModal
-          onUnlock={() => {
-            setIsUnlocked(true);
-            showToast('Vault unlocked. Welcome back!');
-          }}
+          onUnlock={handleUnlockApp}
           savedPasscode={savedPasscode}
           onUpdatePasscode={handleUpdatePasscode}
         />
