@@ -40,7 +40,6 @@ import {
   BarChart2,
   Download,
   Check,
-  Globe,
   Sparkles,
   Library,
   Lock,
@@ -54,7 +53,7 @@ export default function App() {
 
   // App Theme State ('crimson' | 'violet' | 'midnight')
   const [theme, setTheme] = useState<AppTheme>(() => {
-    return (localStorage.getItem('game_log_theme') as AppTheme) || 'crimson';
+    return (localStorage.getItem('game_log_theme') as AppTheme) || 'midnight';
   });
 
   useEffect(() => {
@@ -75,6 +74,8 @@ export default function App() {
     return false;
   });
 
+  const [isPasscodeModalOpen, setIsPasscodeModalOpen] = useState<boolean>(false);
+
   const [savedPasscode, setSavedPasscode] = useState<string>(() => {
     return localStorage.getItem('master_passcode') || '1234';
   });
@@ -89,13 +90,14 @@ export default function App() {
   const handleUnlockApp = () => {
     localStorage.setItem('vault_unlocked_at', Date.now().toString());
     setIsUnlocked(true);
-    showToast('Vault unlocked. PIN session active for 24 hours.');
+    setIsPasscodeModalOpen(false);
+    showToast('Write & Edit Mode unlocked! Full access granted.');
   };
 
   const handleLockApp = () => {
     localStorage.removeItem('vault_unlocked_at');
     setIsUnlocked(false);
-    showToast('Vault locked.');
+    showToast('Switched to Read-Only mode.');
   };
 
   // Views: 'catalog' | 'table' | 'cards' | 'analytics'
@@ -172,6 +174,12 @@ export default function App() {
 
   // Add game
   const handleAddGame = async (gameData: Omit<GameEntry, 'id' | 'createdAt'>) => {
+    if (!isUnlocked) {
+      setIsPasscodeModalOpen(true);
+      showToast('Read-Only Mode: Unlock Write / Edit mode to add games.');
+      return;
+    }
+
     const newEntry: GameEntry = {
       ...gameData,
       id: `game-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
@@ -190,6 +198,12 @@ export default function App() {
 
   // Update game entry
   const handleUpdateGame = async (id: string, updatedFields: Partial<GameEntry>) => {
+    if (!isUnlocked) {
+      setIsPasscodeModalOpen(true);
+      showToast('Read-Only Mode: Unlock Write / Edit mode to make changes.');
+      return;
+    }
+
     const existing = games.find(g => g.id === id);
     if (!existing) return;
     const updated = { ...existing, ...updatedFields };
@@ -205,6 +219,12 @@ export default function App() {
 
   // Delete game entry
   const handleDeleteGame = async (id: string) => {
+    if (!isUnlocked) {
+      setIsPasscodeModalOpen(true);
+      showToast('Read-Only Mode: Unlock Write / Edit mode to delete games.');
+      return;
+    }
+
     const game = games.find(g => g.id === id);
 
     setGames(prev => {
@@ -225,6 +245,12 @@ export default function App() {
 
   // CSV Import
   const handleImportCsv = async (csvText: string) => {
+    if (!isUnlocked) {
+      setIsPasscodeModalOpen(true);
+      showToast('Read-Only Mode: Unlock Write / Edit mode to import CSV.');
+      return;
+    }
+
     const parsed = parseCsvStringToGames(csvText);
     if (parsed.length > 0) {
       setGames(prev => {
@@ -244,6 +270,12 @@ export default function App() {
 
   // Reset defaults
   const handleResetDefaults = async () => {
+    if (!isUnlocked) {
+      setIsPasscodeModalOpen(true);
+      showToast('Read-Only Mode: Unlock Write / Edit mode to reset database.');
+      return;
+    }
+
     const defaults = resetGamesToDefault();
     setGames(defaults);
     saveGamesToStorage(defaults);
@@ -375,16 +407,6 @@ export default function App() {
           {/* View Switcher & Actions */}
           <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             
-            {/* Web Search Trigger */}
-            <button
-              onClick={() => setWebSearchOpen(true)}
-              className="hidden sm:flex py-1.5 px-3 theme-gradient-btn hover:opacity-90 text-white rounded-xl text-xs font-semibold items-center gap-1.5 shadow-md transition-all cursor-pointer"
-              id="header-web-scrape-btn"
-            >
-              <Globe className="w-4 h-4" />
-              <span>Web Scrape</span>
-            </button>
-
             {/* View Modes Switcher */}
             <div className="p-1 rounded-xl border flex items-center gap-0.5 sm:gap-1" style={{ backgroundColor: 'var(--theme-input)', borderColor: 'var(--theme-border)' }}>
               <button
@@ -456,17 +478,37 @@ export default function App() {
               <span>Export CSV</span>
             </button>
 
-            {/* Lock App Vault Button */}
-            <button
-              onClick={handleLockApp}
-              className="p-1.5 sm:py-1.5 sm:px-2.5 hover:opacity-90 text-slate-300 border rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer shrink-0"
-              style={{ backgroundColor: 'var(--theme-surface)', borderColor: 'var(--theme-border)' }}
-              title="Lock Application Vault"
-              id="header-lock-app-btn"
-            >
-              <Lock className="w-3.5 h-3.5 theme-accent-text" />
-              <span className="hidden sm:inline">Lock</span>
-            </button>
+            {/* Write / Edit Mode or Lock Read-Only Toggle Button */}
+            {!isUnlocked ? (
+              <button
+                onClick={() => setIsPasscodeModalOpen(true)}
+                className="py-1.5 px-3 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/50 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all shadow-sm cursor-pointer shrink-0 active:scale-95"
+                title="Unlock Write / Edit mode with Master Passcode"
+                id="header-write-edit-mode-btn"
+              >
+                <Lock className="w-3.5 h-3.5 text-amber-400" />
+                <span className="hidden xs:inline">Write / Edit</span>
+                <span className="xs:hidden">Unlock</span>
+              </button>
+            ) : (
+              <div className="flex items-center gap-1.5 shrink-0">
+                <span className="hidden lg:inline-flex items-center gap-1 px-2.5 py-1 rounded-xl text-xs font-semibold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+                  <Check className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>Edit Active</span>
+                </span>
+                <button
+                  onClick={handleLockApp}
+                  className="p-1.5 sm:py-1.5 sm:px-2.5 hover:opacity-90 text-slate-300 border rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer shrink-0"
+                  style={{ backgroundColor: 'var(--theme-surface)', borderColor: 'var(--theme-border)' }}
+                  title="Lock to Read-Only Mode"
+                  id="header-lock-app-btn"
+                >
+                  <Lock className="w-3.5 h-3.5 theme-accent-text" />
+                  <span className="hidden sm:inline">Lock Read-Only</span>
+                  <span className="sm:hidden">Lock</span>
+                </button>
+              </div>
+            )}
 
             {/* Theme Selector Dropdown */}
             <ThemeSelector
@@ -495,6 +537,8 @@ export default function App() {
           onLockApp={handleLockApp}
           currentTheme={theme}
           onSelectTheme={setTheme}
+          isUnlocked={isUnlocked}
+          onOpenUnlockModal={() => setIsPasscodeModalOpen(true)}
         />
 
         {/* Content Area */}
@@ -518,9 +562,21 @@ export default function App() {
                 games={filteredGames}
                 onUpdateGame={handleUpdateGame}
                 onDeleteGame={handleDeleteGame}
-                onEditModalOpen={(game) => setEditingGame(game)}
+                onEditModalOpen={(game) => {
+                  if (!isUnlocked) {
+                    setIsPasscodeModalOpen(true);
+                  } else {
+                    setEditingGame(game);
+                  }
+                }}
                 onViewModalOpen={(game) => setViewingGame(game)}
-                onOpenWebSearchModal={() => setWebSearchOpen(true)}
+                onOpenWebSearchModal={() => {
+                  if (!isUnlocked) {
+                    setIsPasscodeModalOpen(true);
+                  } else {
+                    setWebSearchOpen(true);
+                  }
+                }}
                 searchQuery={searchQuery}
                 onSearchChange={setSearchQuery}
                 selectedStatus={selectedStatus}
@@ -531,6 +587,8 @@ export default function App() {
                 onGradeChange={setSelectedGrade}
                 showFavoritesOnly={showFavoritesOnly}
                 onFavoritesOnlyToggle={() => setShowFavoritesOnly(prev => !prev)}
+                isUnlocked={isUnlocked}
+                onOpenUnlockModal={() => setIsPasscodeModalOpen(true)}
               />
             )}
 
@@ -539,7 +597,13 @@ export default function App() {
                 games={filteredGames}
                 onUpdateGame={handleUpdateGame}
                 onDeleteGame={handleDeleteGame}
-                onEditModalOpen={(game) => setEditingGame(game)}
+                onEditModalOpen={(game) => {
+                  if (!isUnlocked) {
+                    setIsPasscodeModalOpen(true);
+                  } else {
+                    setEditingGame(game);
+                  }
+                }}
                 onViewModalOpen={(game) => setViewingGame(game)}
                 searchQuery={searchQuery}
                 onSearchChange={setSearchQuery}
@@ -551,6 +615,8 @@ export default function App() {
                 onGradeChange={setSelectedGrade}
                 showFavoritesOnly={showFavoritesOnly}
                 onFavoritesOnlyToggle={() => setShowFavoritesOnly(prev => !prev)}
+                isUnlocked={isUnlocked}
+                onOpenUnlockModal={() => setIsPasscodeModalOpen(true)}
               />
             )}
 
@@ -559,10 +625,18 @@ export default function App() {
                 games={filteredGames}
                 onUpdateGame={handleUpdateGame}
                 onDeleteGame={handleDeleteGame}
-                onEditModalOpen={(game) => setEditingGame(game)}
+                onEditModalOpen={(game) => {
+                  if (!isUnlocked) {
+                    setIsPasscodeModalOpen(true);
+                  } else {
+                    setEditingGame(game);
+                  }
+                }}
                 onViewModalOpen={(game) => setViewingGame(game)}
                 showFavoritesOnly={showFavoritesOnly}
                 onFavoritesOnlyToggle={() => setShowFavoritesOnly(prev => !prev)}
+                isUnlocked={isUnlocked}
+                onOpenUnlockModal={() => setIsPasscodeModalOpen(true)}
               />
             )}
 
@@ -579,19 +653,33 @@ export default function App() {
         game={viewingGame}
         onClose={() => setViewingGame(null)}
         onEdit={(game) => {
-          setViewingGame(null);
-          setEditingGame(game);
-        }}
-        onDelete={(id) => {
-          handleDeleteGame(id);
-          setViewingGame(null);
-        }}
-        onUpdateGame={(id, fields) => {
-          handleUpdateGame(id, fields);
-          if (viewingGame && viewingGame.id === id) {
-            setViewingGame({ ...viewingGame, ...fields });
+          if (!isUnlocked) {
+            setIsPasscodeModalOpen(true);
+          } else {
+            setViewingGame(null);
+            setEditingGame(game);
           }
         }}
+        onDelete={(id) => {
+          if (!isUnlocked) {
+            setIsPasscodeModalOpen(true);
+          } else {
+            handleDeleteGame(id);
+            setViewingGame(null);
+          }
+        }}
+        onUpdateGame={(id, fields) => {
+          if (!isUnlocked) {
+            setIsPasscodeModalOpen(true);
+          } else {
+            handleUpdateGame(id, fields);
+            if (viewingGame && viewingGame.id === id) {
+              setViewingGame({ ...viewingGame, ...fields });
+            }
+          }
+        }}
+        isUnlocked={isUnlocked}
+        onOpenUnlockModal={() => setIsPasscodeModalOpen(true)}
       />
 
       {/* Edit Game Modal */}
@@ -618,10 +706,11 @@ export default function App() {
         }}
       />
 
-      {/* Master Passcode Vault Lock Screen (Requires unlock once every 24hrs) */}
-      {!isUnlocked && (
+      {/* Master Passcode Vault Lock Screen */}
+      {isPasscodeModalOpen && (
         <PasscodeLockModal
           onUnlock={handleUnlockApp}
+          onClose={() => setIsPasscodeModalOpen(false)}
           savedPasscode={savedPasscode}
           onUpdatePasscode={handleUpdatePasscode}
         />

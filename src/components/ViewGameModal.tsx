@@ -8,6 +8,8 @@ interface ViewGameModalProps {
   onEdit: (game: GameEntry) => void;
   onDelete: (id: string) => void;
   onUpdateGame: (id: string, updatedFields: Partial<GameEntry>) => void;
+  isUnlocked?: boolean;
+  onOpenUnlockModal?: () => void;
 }
 
 export const ViewGameModal: React.FC<ViewGameModalProps> = ({
@@ -15,7 +17,9 @@ export const ViewGameModal: React.FC<ViewGameModalProps> = ({
   onClose,
   onEdit,
   onDelete,
-  onUpdateGame
+  onUpdateGame,
+  isUnlocked = false,
+  onOpenUnlockModal
 }) => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
@@ -249,7 +253,13 @@ export const ViewGameModal: React.FC<ViewGameModalProps> = ({
           ) : (
             <>
               <button
-                onClick={() => setShowDeleteConfirm(true)}
+                onClick={() => {
+                  if (!isUnlocked) {
+                    onOpenUnlockModal?.();
+                  } else {
+                    setShowDeleteConfirm(true);
+                  }
+                }}
                 className="px-3 py-2 text-xs text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 rounded-xl border border-rose-500/20 transition-colors cursor-pointer flex items-center gap-1.5"
               >
                 <Trash2 className="w-3.5 h-3.5" />
@@ -266,8 +276,12 @@ export const ViewGameModal: React.FC<ViewGameModalProps> = ({
                 </button>
                 <button
                   onClick={() => {
-                    onClose();
-                    onEdit(game);
+                    if (!isUnlocked) {
+                      onOpenUnlockModal?.();
+                    } else {
+                      onClose();
+                      onEdit(game);
+                    }
                   }}
                   className="px-4 py-2 text-xs font-semibold theme-accent-bg hover:opacity-90 text-white rounded-xl transition-colors cursor-pointer flex items-center gap-1.5 shadow-lg"
                 >

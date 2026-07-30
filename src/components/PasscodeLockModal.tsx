@@ -1,14 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { Lock, Unlock, KeyRound, ShieldAlert, Sparkles, Check, Eye, EyeOff, ShieldCheck, Gamepad2, Settings, AlertCircle } from 'lucide-react';
+import React, { useState } from 'react';
+import { Lock, Unlock, KeyRound, Check, Eye, EyeOff, ShieldCheck, Gamepad2, Settings, AlertCircle, X, Sparkles } from 'lucide-react';
 
 interface PasscodeLockModalProps {
   onUnlock: () => void;
+  onClose?: () => void;
   savedPasscode: string;
   onUpdatePasscode: (newPasscode: string) => void;
 }
 
 export const PasscodeLockModal: React.FC<PasscodeLockModalProps> = ({
   onUnlock,
+  onClose,
   savedPasscode,
   onUpdatePasscode
 }) => {
@@ -92,7 +94,7 @@ export const PasscodeLockModal: React.FC<PasscodeLockModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-md p-4 animate-fade-in select-none overflow-hidden max-w-full">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-fade-in select-none overflow-hidden max-w-full">
       
       {/* Background Decorative Neon Glows */}
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[500px] h-[300px] bg-[#EE4540]/15 blur-[120px] rounded-full pointer-events-none" />
@@ -105,6 +107,17 @@ export const PasscodeLockModal: React.FC<PasscodeLockModalProps> = ({
         style={{ backgroundColor: 'var(--theme-surface)', borderColor: 'var(--theme-border)' }}
         id="passcode-lock-card"
       >
+        {/* Close Modal Button if in Read-Only Mode */}
+        {onClose && (
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 p-1.5 rounded-full text-slate-400 hover:text-slate-100 hover:bg-slate-800 transition-colors z-10 cursor-pointer"
+            title="Cancel & stay in Read-Only mode"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        )}
+
         {/* Top Header Badge */}
         <div className="p-6 text-center border-b relative" style={{ backgroundColor: 'var(--theme-bg)', borderColor: 'var(--theme-border)' }}>
           <div className="inline-flex p-3 rounded-2xl theme-accent-bg/20 border border-amber-500/30 theme-accent-text mb-3 shadow-lg">
@@ -113,16 +126,16 @@ export const PasscodeLockModal: React.FC<PasscodeLockModalProps> = ({
 
           <h2 className="text-xl font-extrabold text-slate-100 tracking-tight flex items-center justify-center gap-2">
             <Gamepad2 className="w-5 h-5 theme-accent-text" />
-            <span>Master Passcode Vault</span>
+            <span>Unlock Write & Edit Mode</span>
           </h2>
           
           <p className="text-xs text-slate-400 mt-1 max-w-xs mx-auto">
-            Private Backlog Protection enabled. Enter passcode to access your games.
+            Enter master passcode to unlock full editing, grading, and catalog management rights.
           </p>
 
           <div className="mt-3 inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-[11px] font-mono text-slate-300" style={{ backgroundColor: 'var(--theme-input)', borderColor: 'var(--theme-border)' }}>
             <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-            <span>Security: PIN required once every 24hrs</span>
+            <span>PIN protects Add, Grade, & Delete</span>
           </div>
         </div>
 
@@ -218,7 +231,7 @@ export const PasscodeLockModal: React.FC<PasscodeLockModalProps> = ({
                 id="btn-unlock-vault"
               >
                 <Unlock className="w-4 h-4" />
-                <span>Unlock Backlog Vault</span>
+                <span>Unlock Write & Edit Mode</span>
               </button>
 
               {/* Default Passcode Hint / Info */}

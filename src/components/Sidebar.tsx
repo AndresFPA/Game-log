@@ -16,6 +16,8 @@ interface SidebarProps {
   onLockApp?: () => void;
   currentTheme?: AppTheme;
   onSelectTheme?: (theme: AppTheme) => void;
+  isUnlocked?: boolean;
+  onOpenUnlockModal?: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -29,7 +31,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onOpenWebSearchModal,
   onLockApp,
   currentTheme = 'crimson',
-  onSelectTheme
+  onSelectTheme,
+  isUnlocked = false,
+  onOpenUnlockModal
 }) => {
   // Form state
   const [title, setTitle] = useState('');
@@ -103,6 +107,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isUnlocked) {
+      onOpenUnlockModal?.();
+      return;
+    }
     if (!title.trim()) return;
 
     const finalPlatform = platform === 'Other' && customPlatform.trim() ? customPlatform.trim() : platform;
@@ -137,6 +145,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
   };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!isUnlocked) {
+      onOpenUnlockModal?.();
+      e.target.value = '';
+      return;
+    }
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -195,6 +208,29 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
         {/* Scrollable Form & Controls Body */}
         <div className="flex-1 overflow-y-auto p-4 space-y-6 custom-scrollbar">
+
+          {/* Read-Only Mode Banner */}
+          {!isUnlocked && (
+            <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-200 text-xs space-y-2.5 shadow-sm">
+              <div className="flex items-center gap-2 font-bold text-amber-300">
+                <Lock className="w-4 h-4 text-amber-400 shrink-0" />
+                <span>Read-Only Mode Active</span>
+              </div>
+              <p className="text-[11px] text-amber-200/90 leading-relaxed">
+                You are viewing the catalog in read-only mode. Enter your master passcode to unlock full write, grade, and catalog editing rights.
+              </p>
+              {onOpenUnlockModal && (
+                <button
+                  type="button"
+                  onClick={onOpenUnlockModal}
+                  className="w-full py-2 px-3 bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-200 text-xs font-bold rounded-lg flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-sm active:scale-98"
+                >
+                  <KeyRound className="w-4 h-4 text-amber-400" />
+                  <span>Unlock Write / Edit Mode</span>
+                </button>
+              )}
+            </div>
+          )}
 
           {/* Section 1: Add Entry Form */}
           <div className="p-4 rounded-xl border shadow-sm space-y-3" style={{ backgroundColor: 'var(--theme-card)', borderColor: 'var(--theme-border)' }}>
