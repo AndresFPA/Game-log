@@ -214,11 +214,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-200 text-xs space-y-2.5 shadow-sm">
               <div className="flex items-center gap-2 font-bold text-amber-300">
                 <Lock className="w-4 h-4 text-amber-400 shrink-0" />
-                <span>Read-Only Mode Active</span>
+                <span>Read-Only Mode</span>
               </div>
-              <p className="text-[11px] text-amber-200/90 leading-relaxed">
-                You are viewing the catalog in read-only mode. Enter your master passcode to unlock full write, grade, and catalog editing rights.
-              </p>
               {onOpenUnlockModal && (
                 <button
                   type="button"
