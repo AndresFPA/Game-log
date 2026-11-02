@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { GameEntry, CompletionStatus, Grade, SortField, SortOrder } from '../types';
+import { formatDateDDMMYYYY } from '../utils/dateUtils';
 import { Star, Clock, Calendar, Edit3, Trash2, ArrowUp, ArrowDown } from 'lucide-react';
 
 interface CardGridViewProps {
@@ -21,7 +22,7 @@ export const CardGridView: React.FC<CardGridViewProps> = ({
   showFavoritesOnly = false,
   onFavoritesOnlyToggle
 }) => {
-  const [sortField, setSortField] = useState<SortField>('createdAt');
+  const [sortField, setSortField] = useState<SortField>('beatenDate');
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
 
   const getFallbackCover = (title: string) => {
@@ -72,6 +73,15 @@ export const CardGridView: React.FC<CardGridViewProps> = ({
       aVal = order[a.grade] || 0;
       bVal = order[b.grade] || 0;
     } else if (sortField === 'createdAt' || sortField === 'beatenDate') {
+      if (sortField === 'beatenDate') {
+        if (!aVal && !bVal) {
+          const aCreated = new Date(a.createdAt || 0).getTime() || 0;
+          const bCreated = new Date(b.createdAt || 0).getTime() || 0;
+          return bCreated - aCreated;
+        }
+        if (!aVal) return 1;
+        if (!bVal) return -1;
+      }
       const aTime = aVal ? new Date(aVal).getTime() || 0 : 0;
       const bTime = bVal ? new Date(bVal).getTime() || 0 : 0;
       if (aTime < bTime) return sortOrder === 'asc' ? -1 : 1;
@@ -122,8 +132,8 @@ export const CardGridView: React.FC<CardGridViewProps> = ({
             style={{ backgroundColor: 'var(--theme-input)', borderColor: 'var(--theme-border)' }}
             id="cards-sort-field"
           >
-            <option value="createdAt">Sort: Date Added</option>
             <option value="beatenDate">Sort: Date Completed</option>
+            <option value="createdAt">Sort: Date Added</option>
             <option value="title">Sort: Title A-Z</option>
             <option value="grade">Sort: Grade Tier</option>
             <option value="status">Sort: Status</option>
@@ -237,9 +247,9 @@ export const CardGridView: React.FC<CardGridViewProps> = ({
                   {game.hoursPlayed}h
                 </span>
                 {game.beatenDate && (
-                  <span className="flex items-center gap-1 text-slate-400">
-                    <Calendar className="w-3.5 h-3.5 text-slate-500" />
-                    {game.beatenDate}
+                  <span className="flex items-center gap-1 text-slate-400 font-mono text-[11px]" title="Date Completed (DD/MM/YYYY)">
+                    <Calendar className="w-3.5 h-3.5 text-emerald-400" />
+                    {formatDateDDMMYYYY(game.beatenDate)}
                   </span>
                 )}
               </div>

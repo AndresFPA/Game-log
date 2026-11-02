@@ -1,5 +1,6 @@
 import { GameEntry, CompletionStatus, Grade } from '../types';
 import { INITIAL_GAMES } from '../data/initialGames';
+import { parseDateToYMD } from './dateUtils';
 
 const STORAGE_KEY = 'streamlit_game_tracker_data_v1';
 
@@ -182,7 +183,7 @@ export function parseCsvStringToGames(csvText: string): GameEntry[] {
       platform: getValue(platformIdx, 'PC / Steam'),
       status,
       grade,
-      beatenDate: getValue(beatenDateIdx, ''),
+      beatenDate: parseDateToYMD(getValue(beatenDateIdx, '')),
       hoursPlayed,
       genre: getValue(genreIdx, 'General'),
       coverUrl: getValue(coverUrlIdx, ''),

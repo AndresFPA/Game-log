@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { GameEntry, CompletionStatus, Grade, SortField, SortOrder, STATUS_OPTIONS, GRADE_OPTIONS } from '../types';
+import { formatDateDDMMYYYY } from '../utils/dateUtils';
 import {
   Star,
   Clock,
@@ -52,7 +53,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
   showFavoritesOnly = false,
   onFavoritesOnlyToggle
 }) => {
-  const [sortField, setSortField] = useState<SortField>('createdAt');
+  const [sortField, setSortField] = useState<SortField>('beatenDate');
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
@@ -106,6 +107,15 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
       aVal = order[a.grade] || 0;
       bVal = order[b.grade] || 0;
     } else if (sortField === 'createdAt' || sortField === 'beatenDate') {
+      if (sortField === 'beatenDate') {
+        if (!aVal && !bVal) {
+          const aCreated = new Date(a.createdAt || 0).getTime() || 0;
+          const bCreated = new Date(b.createdAt || 0).getTime() || 0;
+          return bCreated - aCreated;
+        }
+        if (!aVal) return 1;
+        if (!bVal) return -1;
+      }
       const aTime = aVal ? new Date(aVal).getTime() || 0 : 0;
       const bTime = bVal ? new Date(bVal).getTime() || 0 : 0;
       if (aTime < bTime) return sortOrder === 'asc' ? -1 : 1;
@@ -229,8 +239,8 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
             style={{ backgroundColor: 'var(--theme-input)', borderColor: 'var(--theme-border)' }}
             id="catalog-sort-field"
           >
-            <option value="createdAt">Sort: Date Added</option>
             <option value="beatenDate">Sort: Date Completed</option>
+            <option value="createdAt">Sort: Date Added</option>
             <option value="title">Sort: Title A-Z</option>
             <option value="grade">Sort: Grade Tier</option>
             <option value="status">Sort: Status</option>
@@ -394,6 +404,13 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
                 </span>
 
                 <div className="flex items-center gap-2">
+                  {game.beatenDate && (
+                    <span className="text-[10px] text-slate-400 flex items-center gap-1 font-mono" title="Date Completed (DD/MM/YYYY)">
+                      <Calendar className="w-3 h-3 text-emerald-400" />
+                      {formatDateDDMMYYYY(game.beatenDate)}
+                    </span>
+                  )}
+
                   <span className="theme-accent-text font-bold flex items-center gap-0.5">
                     <Clock className="w-3 h-3 theme-accent-text" />
                     {game.hoursPlayed}h

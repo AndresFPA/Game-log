@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { GameEntry, CompletionStatus, Grade, SortField, SortOrder, STATUS_OPTIONS, GRADE_OPTIONS } from '../types';
+import { formatDateDDMMYYYY } from '../utils/dateUtils';
 import { Star, Edit3, Trash2, ArrowUpDown, ArrowUp, ArrowDown, Clock, Calendar, Gamepad2 } from 'lucide-react';
 
 interface EditableTableProps {
@@ -37,7 +38,7 @@ export const EditableTable: React.FC<EditableTableProps> = ({
   showFavoritesOnly = false,
   onFavoritesOnlyToggle
 }) => {
-  const [sortField, setSortField] = useState<SortField>('createdAt');
+  const [sortField, setSortField] = useState<SortField>('beatenDate');
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
@@ -64,6 +65,15 @@ export const EditableTable: React.FC<EditableTableProps> = ({
       aVal = order[a.grade] || 0;
       bVal = order[b.grade] || 0;
     } else if (sortField === 'createdAt' || sortField === 'beatenDate') {
+      if (sortField === 'beatenDate') {
+        if (!aVal && !bVal) {
+          const aCreated = new Date(a.createdAt || 0).getTime() || 0;
+          const bCreated = new Date(b.createdAt || 0).getTime() || 0;
+          return bCreated - aCreated;
+        }
+        if (!aVal) return 1;
+        if (!bVal) return -1;
+      }
       const aTime = aVal ? new Date(aVal).getTime() || 0 : 0;
       const bTime = bVal ? new Date(bVal).getTime() || 0 : 0;
       if (aTime < bTime) return sortOrder === 'asc' ? -1 : 1;
@@ -298,7 +308,7 @@ export const EditableTable: React.FC<EditableTableProps> = ({
                   className="py-3 px-3 cursor-pointer hover:text-slate-200 group"
                 >
                   <div className="flex items-center gap-1.5">
-                    <span>Beaten Date</span>
+                    <span>Date Completed (DD/MM/YYYY)</span>
                     {renderSortIcon('beatenDate')}
                   </div>
                 </th>
@@ -431,16 +441,25 @@ export const EditableTable: React.FC<EditableTableProps> = ({
                     </select>
                   </td>
 
-                  {/* Beaten Date (Editable Date picker) */}
+                  {/* Beaten Date (Editable Date picker formatted as DD/MM/YYYY) */}
                   <td className="py-3 px-3 whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
-                    <input
-                      type="date"
-                      value={game.beatenDate || ''}
-                      onChange={(e) =>
-                        onUpdateGame(game.id, { beatenDate: e.target.value })
-                      }
-                      className="bg-transparent border border-transparent hover:border-slate-700 focus:border-indigo-500 focus:bg-slate-900 px-1.5 py-0.5 rounded text-xs text-slate-300 font-mono focus:outline-none cursor-pointer"
-                    />
+                    <div className="relative inline-flex items-center">
+                      <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg border border-slate-800 hover:border-slate-700 bg-slate-900/60 font-mono text-xs">
+                        <Calendar className="w-3.5 h-3.5 text-slate-400 shrink-0 pointer-events-none" />
+                        <span className={game.beatenDate ? 'text-slate-200 font-semibold' : 'text-slate-500'}>
+                          {game.beatenDate ? formatDateDDMMYYYY(game.beatenDate) : 'DD/MM/YYYY'}
+                        </span>
+                      </div>
+                      <input
+                        type="date"
+                        value={game.beatenDate || ''}
+                        onChange={(e) =>
+                          onUpdateGame(game.id, { beatenDate: e.target.value })
+                        }
+                        className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                        title="Click to set date (DD/MM/YYYY)"
+                      />
+                    </div>
                   </td>
 
                   {/* Hours Played (Editable Number) */}

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { GameEntry, CompletionStatus, Grade, AppTheme, PLATFORM_OPTIONS, STATUS_OPTIONS, GRADE_OPTIONS, GENRE_OPTIONS } from '../types';
+import { formatDateDDMMYYYY } from '../utils/dateUtils';
 import { ThemeSelector } from './ThemeSelector';
 import { PlusCircle, Download, Upload, RefreshCw, X, Gamepad2, FileSpreadsheet, Sparkles, Loader2, Calendar, FileText, Image as ImageIcon, Lock, KeyRound, Palette } from 'lucide-react';
 import { searchGames } from '../utils/gameSearch';
@@ -472,17 +473,29 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <label className="block text-xs font-medium text-slate-300 mb-1">
-                    Beaten Date
+                  <label className="block text-xs font-medium text-slate-300 mb-1 flex items-center justify-between">
+                    <span>Date Completed</span>
+                    <span className="text-[10px] text-slate-400 font-mono">DD/MM/YYYY</span>
                   </label>
-                  <input
-                    type="date"
-                    value={beatenDate}
-                    onChange={(e) => setBeatenDate(e.target.value)}
-                    className="w-full px-2 py-1.5 border rounded-lg text-xs text-slate-100 focus:outline-none"
-                    style={{ backgroundColor: 'var(--theme-input)', borderColor: 'var(--theme-border)' }}
-                    id="input-beaten-date"
-                  />
+                  <div className="relative">
+                    <div
+                      className="w-full px-2.5 py-1.5 border rounded-lg text-xs font-mono flex items-center justify-between"
+                      style={{ backgroundColor: 'var(--theme-input)', borderColor: 'var(--theme-border)' }}
+                    >
+                      <span className={beatenDate ? 'text-slate-100 font-semibold' : 'text-slate-500'}>
+                        {beatenDate ? formatDateDDMMYYYY(beatenDate) : 'DD/MM/YYYY'}
+                      </span>
+                      <Calendar className="w-3.5 h-3.5 text-slate-400 shrink-0 pointer-events-none" />
+                    </div>
+                    <input
+                      type="date"
+                      value={beatenDate}
+                      onChange={(e) => setBeatenDate(e.target.value)}
+                      className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                      id="input-beaten-date"
+                      title="Select Date (DD/MM/YYYY)"
+                    />
+                  </div>
                 </div>
 
                 <div>

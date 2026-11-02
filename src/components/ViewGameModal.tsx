@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { GameEntry, CompletionStatus, Grade } from '../types';
+import { formatDateDDMMYYYY } from '../utils/dateUtils';
 import { X, Edit3, Trash2, Calendar, Clock, Star, Gamepad2, Award, BookOpen, Layers, CheckCircle2, AlertTriangle } from 'lucide-react';
 
 interface ViewGameModalProps {
@@ -193,7 +194,7 @@ export const ViewGameModal: React.FC<ViewGameModalProps> = ({
                   <Calendar className="w-4 h-4 text-emerald-400 shrink-0" />
                   <div className="min-w-0">
                     <p className="text-[10px] uppercase font-mono text-slate-400">Date Beaten</p>
-                    <p className="text-xs font-bold text-slate-200 truncate">{game.beatenDate || 'Not recorded'}</p>
+                    <p className="text-xs font-bold text-slate-200 truncate font-mono">{formatDateDDMMYYYY(game.beatenDate) || 'Not recorded'}</p>
                   </div>
                 </div>
               </div>
@@ -213,7 +214,7 @@ export const ViewGameModal: React.FC<ViewGameModalProps> = ({
 
           {/* Added Date Footer */}
           <div className="flex items-center justify-between text-[11px] font-mono text-slate-400 pt-1">
-            <span>Added to catalog: {new Date(game.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}</span>
+            <span>Added to catalog: {formatDateDDMMYYYY(game.createdAt)}</span>
             <span className="flex items-center gap-1 text-slate-400">
               <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" /> ID: {game.id}
             </span>
